@@ -1,10 +1,10 @@
 import { Controller, Get, Post, Body, Param, Delete, HttpCode, NotFoundException, Req, Put, ConflictException } from '@nestjs/common';
-import { TakService } from './tak.service';
+import { StatusTypeService } from './statusType.service';
 
-@Controller('tak')
-export class TakController {
+@Controller('statusType')
+export class StatusTypeController {
   constructor(
-    private service: TakService, 
+    private service: StatusTypeService, 
   ){}
 
   @Get()
@@ -16,8 +16,8 @@ export class TakController {
   @Post()
   async crear(@Body() body: any, @Req() req: Request){
     try {
-      const TabuscarTak = await this.service.createTak(body);
-      return TabuscarTak
+      const response = await this.service.createStatusType(body);
+      return response
     } catch (error) {
       if(error.code === 11000){
         throw new ConflictException('The element already exists');
@@ -27,7 +27,7 @@ export class TakController {
   }
 
   @Post('listAsync')
-  async listAsyncTak(@Body() body: any, @Req() req: Request){
+  async listAsyncStatusType(@Body() body: any, @Req() req: Request){
     try {
       const response = await this.service.listAsync( body );
       return response
@@ -38,16 +38,16 @@ export class TakController {
   }
 
   @Put(':id')
-  async actualizar(@Param('id')  id : string, @Body() body: any, @Req() req: Request){
-    const res = await this.service.updateTak(id, body);
+  async actualizarStatusType(@Param('id')  id : string, @Body() body: any, @Req() req: Request){
+    const res = await this.service.updateStatusType(id, body);
     if(!res) throw new NotFoundException('Item not found!');
     return res;
   }
   
   @Delete(':id')
   @HttpCode(204)
-  async eliminar(@Param('id') id:string, @Req() req: Request){
-    const res = await this.service.deleteTak(id);
+  async deleteStatusType(@Param('id') id:string, @Req() req: Request){
+    const res = await this.service.deleteStatusType(id);
     if(!res) throw new NotFoundException('Elemento no eliminado...!');
     return res;
   }

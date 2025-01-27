@@ -1,9 +1,10 @@
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
-import { ApiConsumerModule } from './api-consumer/api-consumer.module';
-import { TakModule } from './Tak/tak.module';
-import { UserModule } from './User/user.module';
-import { AreaModule } from './Area/area.module';
+import { ApiConsumerModule } from './modules/api-consumer/api-consumer.module';
+import { TakModule } from './modules/Tak/tak.module';
+import { UserModule } from './modules/User/user.module';
+import { AreaModule } from './modules/Area/area.module';
+
 
 
 @Module({

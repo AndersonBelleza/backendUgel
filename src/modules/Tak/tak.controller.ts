@@ -65,10 +65,10 @@ export class TakController {
   @Delete(':id')
   @HttpCode(204)
   async eliminar(@Param('id') id:string, @Req() req: Request): Promise<void>{
-    const res = await this.service.softDelete(id);
+    const res = await this.service.deleteTak(id);
     if (!res) {
       throw new NotFoundException(`El elemento con id ${id} no fue encontrado o ya estaba eliminado.`);
     }
-    this.gateway.emitEvent('takDeleted', { id });
+    // this.gateway.emitEvent('takDeleted', { id });
   }
 }

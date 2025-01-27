@@ -3,9 +3,9 @@ import { TakService } from './tak.service';
 import { TakController } from './tak.controller';
 import { MongooseModule } from '@nestjs/mongoose';
 import { Tak, TakSchema } from './tak.schema';
-import { UserModule } from 'src/User/user.module';
-import { StatusTypeModule } from 'src/statusType/statusType.module';
 import { WebSocketGateway } from './tak.gateway';
+import { UserModule } from '../User/user.module';
+import { StatusTypeModule } from '../statusType/statusType.module';
 
 @Module({
   imports: [

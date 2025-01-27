@@ -21,7 +21,14 @@ export class Tak {
 
   @Prop({ type: Types.ObjectId, ref: 'StatusType' })
   idStatusPriority: Types.ObjectId;
+  
+  // Campo para soft delete
+  @Prop({ default: false, type: Boolean })
+  isDeleted: boolean;
 
+  // Campo para la fecha de eliminación
+  @Prop({ type: Date, default: null })
+  deletedAt: Date | null;
 }
 
 export const TakSchema = SchemaFactory.createForClass(Tak);

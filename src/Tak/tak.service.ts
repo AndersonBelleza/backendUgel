@@ -13,7 +13,16 @@ export class TakService {
   }
 
   async listAsync ( data : any = {} ){
+    const todayStart = new Date();
+    todayStart.setHours(0, 0, 0, 0); // Inicio del día actual
+  
+    const todayEnd = new Date();
+    todayEnd.setHours(23, 59, 59, 999); // Fin del día actual
     return await this.TakModel.find( data )
+    .find({
+      createdAt: { $gte: todayStart, $lte: todayEnd }, // Filtro por fecha actual
+    })
+    .sort({ createdAt: -1 }) 
     .populate([
       {
         path: 'idUser',
@@ -40,13 +49,42 @@ export class TakService {
     const nuevoTak = await this.TakModel.create(crearTak);
     return nuevoTak.save();
   }
-
-  async updateTak(id: string, Tak : object){
-    return await this.TakModel.findByIdAndUpdate(id, Tak);
-  }
-
+  
   async deleteTak(id: string){
     return await this.TakModel.findByIdAndDelete(id);
   }
 
+  async updateTak(id: string, Tak : object){
+    return this.TakModel.findByIdAndUpdate(id, Tak, {
+      new: true, // Retorna el documento actualizado
+      runValidators: true, // Ejecuta las validaciones definidas en el esquema
+    });
+  }
+
+  async findById(id: string) {
+    return this.TakModel.findById(id)
+      .populate({
+        path: 'idUser', // Relación principal
+        populate: {
+          path: 'idArea', // Relación dentro de idUser
+          select: 'name floorNumber', // Solo incluye estos campos
+        },
+      })
+      .populate('idStatusType') // Populate para idStatusType
+      .populate('idStatusPriority'); // Populate para idStatusPriority
+  }
+
+    // Soft delete: marcar un registro como eliminado
+    async softDelete(id: string): Promise<boolean> {
+      const tak = await this.TakModel.findById(id);
+      if (!tak || tak.isDeleted) {
+        // Si no existe o ya está eliminado, devolver null
+        return false;
+      }
+  
+      tak.isDeleted = true;
+      tak.deletedAt = new Date();
+      await tak.save(); // Guardar los cambios
+      return true; // Retorna true si fue exitoso
+    }
 }

@@ -5,6 +5,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { Tak, TakSchema } from './tak.schema';
 import { UserModule } from 'src/User/user.module';
 import { StatusTypeModule } from 'src/statusType/statusType.module';
+import { WebSocketGateway } from './tak.gateway';
 
 @Module({
   imports: [
@@ -18,6 +19,6 @@ import { StatusTypeModule } from 'src/statusType/statusType.module';
     StatusTypeModule
   ],
   controllers: [ TakController ],
-  providers: [ TakService ],
+  providers: [ TakService, WebSocketGateway ],
 })
 export class TakModule {}

@@ -7,9 +7,7 @@ export class ConfigService{
   constructor(@InjectConnection() private readonly connection: Connection) {}
   
   async TemporalData(){
-    const collections = Object.keys(this.connection.collections);
-    console.log("collections ",collections);
-    
+    const collections = Object.keys(this.connection.collections);    
     return collections;
   }
 

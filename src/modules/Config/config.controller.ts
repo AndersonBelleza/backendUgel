@@ -4,7 +4,7 @@ import { Auth } from "src/middlewares/decorators/auth.decorator";
 import { Role } from "src/middlewares/role.enum";
 import Request from 'src/interfaces/requestUser'
 
-@Auth(Role.ADMIN, Role.OWNER)
+// @Auth(Role.ADMIN, Role.OWNER)
 @Controller('config')
 export class ConfigController{
   constructor( private configService: ConfigService){}
@@ -19,7 +19,7 @@ export class ConfigController{
     return this.configService.resetOne(collectionName);
   }
 
-  @Get('removeOne2/:configName')
+  @Get('delete/:configName')
   deleteOneList(@Param('configName') collectionName: string, @Req() req: Request){
     return this.configService.deleteOne(collectionName);
   }

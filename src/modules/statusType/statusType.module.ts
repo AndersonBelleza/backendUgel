@@ -13,6 +13,7 @@ import { StatusType, StatusTypeSchema } from './statusType.schema';
   ])],
   controllers: [ StatusTypeController ],
   providers: [ StatusTypeService ],
+  exports: [ StatusTypeService ]
 })
 
 export class StatusTypeModule {}

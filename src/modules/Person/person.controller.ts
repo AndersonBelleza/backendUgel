@@ -1,22 +1,21 @@
 import { Controller, Get, Post, Body, Param, Delete, HttpCode, NotFoundException, Req, Put, ConflictException } from '@nestjs/common';
-import { AreaService } from './area.service';
+import { PersonService } from './person.service';
 
-@Controller('area')
-export class AreaController {
+@Controller('person')
+export class PersonController {
   constructor(
-    private service: AreaService, 
+    private service: PersonService, 
   ){}
 
   @Get()
   buscar(@Req() req: Request){
     return this.service.list();
-    
   }
 
   @Post()
   async crear(@Body() body: any, @Req() req: Request){
     try {
-      const response = await this.service.createArea(body);
+      const response = await this.service.createPerson(body);
       return response
     } catch (error) {
       if(error.code === 11000){
@@ -27,7 +26,7 @@ export class AreaController {
   }
 
   @Post('listAsync')
-  async listAsyncArea(@Body() body: any, @Req() req: Request){
+  async listAsyncPerson(@Body() body: any, @Req() req: Request){
     try {
       const response = await this.service.listAsync( body );
       return response
@@ -37,10 +36,9 @@ export class AreaController {
     }
   }
 
-  @Post('listAreaAll')
-  async listAreaAll(@Body() body: any, @Req() req: Request){
+  @Post('listPersonAll')
+  async listPersonAll(@Body() body: any, @Req() req: Request){
     try {
-      // Faltaría listar las Áreas activas.
       const response = await this.service.listAsync( body );
       return response
 
@@ -50,16 +48,16 @@ export class AreaController {
   }
 
   @Put(':id')
-  async actualizarArea(@Param('id')  id : string, @Body() body: any, @Req() req: Request){
-    const res = await this.service.updateArea(id, body);
+  async updatePerson(@Param('id')  id : string, @Body() body: any, @Req() req: Request){
+    const res = await this.service.updatePerson(id, body);
     if(!res) throw new NotFoundException('Item not found!');
     return res;
   }
   
   @Delete(':id')
   @HttpCode(204)
-  async deleteArea(@Param('id') id:string, @Req() req: Request){
-    const res = await this.service.deleteArea(id);
+  async deletePerson(@Param('id') id:string, @Req() req: Request){
+    const res = await this.service.deletePerson(id);
     if(!res) throw new NotFoundException('Elemento no eliminado...!');
     return res;
   }

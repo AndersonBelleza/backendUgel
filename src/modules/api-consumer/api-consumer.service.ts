@@ -1,6 +1,4 @@
 import { Injectable } from '@nestjs/common';
-import { CreateApiConsumerDto } from './dto/create-api-consumer.dto';
-import { UpdateApiConsumerDto } from './dto/update-api-consumer.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { ApiConsumer } from './api-consumer.schema';
 import { Model } from 'mongoose';

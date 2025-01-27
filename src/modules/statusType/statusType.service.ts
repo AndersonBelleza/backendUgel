@@ -15,6 +15,10 @@ export class StatusTypeService {
   async listAsync ( data : any = {} ){
     return await this.model.find( data );
   }
+
+  async findOne( data : any ){
+    return await this.model.findOne(data);
+  }
   
   async createStatusType(crearStatusType : object){
     const nuevoStatusType = await this.model.create(crearStatusType);

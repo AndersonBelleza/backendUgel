@@ -6,7 +6,9 @@ import { Types } from "mongoose";
 })
 
 export class User {
-  // Campos tipo ObjectId
+  @Prop({ default: '0', type: String })
+  bool: string;
+
   @Prop({ type: Types.ObjectId, ref: 'Person' })
   idPerson: Types.ObjectId;
 
@@ -16,20 +18,14 @@ export class User {
   @Prop({ type: Types.ObjectId, ref: 'Area' })
   idArea: Types.ObjectId;
 
-  @Prop({ required: false }) // Campo obligatorio
-  password: string;
-
   @Prop({ required: true, unique: true })
   username: string;
 
-  @Prop({ required: true, unique: true })
+  @Prop({ required: false }) // Campo obligatorio
+  password: string;
+
+  @Prop({ required: true })
   role: string;
-
-  @Prop({ default: '0', type: String })
-  bool: string;
-
-  @Prop({ type: String })
-  description: string;
 
   @Prop({ type: Date })
   dateExpired: Date;

@@ -6,27 +6,59 @@ import { InjectModel } from '@nestjs/mongoose';
 
 @Injectable()
 export class UserService {
-  constructor(@InjectModel(User.name) private UserModel : Model<User>) {}
+  constructor(@InjectModel(User.name) private model: Model<User>) { }
 
-  async list(){
-    return await this.UserModel.find();
+  async list() {
+    return await this.model.find();
   }
 
-  async listAsync ( data : any = {} ){
-    return await this.UserModel.find( data );
+  async listAsync(body: any, skip: number = 0, limit: any = null) {
+    const totalRecordsQuery = this.model.countDocuments(body);
+    const paginatedResultsQuery = this.model.find(body)
+      .populate([
+        {
+          path: 'idStatusType',
+          select: 'name color'
+        },
+        {
+          path: 'idPerson',
+          select: 'firstName lastName'
+        },
+        {
+          path: 'idArea',
+          select: 'name floorNumber'
+        },
+      ])
+      .skip(skip)
+      .limit(limit)
+      .sort({ createdAt: 'desc' })
+      .lean()
+      .exec();
+
+    return Promise.all([totalRecordsQuery, paginatedResultsQuery])
+      .then(([totalRecords, paginatedResults]) => {
+        return {
+          total: totalRecords,
+          results: paginatedResults
+        };
+      });
   }
-  
-  async createUser(crearUser : object){
-    const nuevoUser = await this.UserModel.create(crearUser);
+
+  async findOne(data: any = {}) {
+    return await this.model.findOne(data);
+  }
+
+  async createUser(crearUser: object) {
+    const nuevoUser = await this.model.create(crearUser);
     return nuevoUser.save();
   }
 
-  async updateUser(id: string, User : object){
-    return await this.UserModel.findByIdAndUpdate(id, User);
+  async updateUser(id: string, User: object) {
+    return await this.model.findByIdAndUpdate(id, User);
   }
 
-  async deleteUser(id: string){
-    return await this.UserModel.findByIdAndDelete(id);
+  async deleteUser(id: string) {
+    return await this.model.findByIdAndDelete(id);
   }
 
 }

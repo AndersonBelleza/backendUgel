@@ -52,6 +52,10 @@ export class UserService {
     });
   }
 
+  async searchIdUser(id: string) {
+    return await this.model.findById(id)
+  }
+
   async createUser(crearUser: object) {
     const nuevoUser = await this.model.create(crearUser);
     return nuevoUser.save();

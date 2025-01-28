@@ -1,7 +1,7 @@
 import { Body, Controller, Get, Res, Post, Req } from '@nestjs/common';
 import { Response } from 'express';
 import { ValidadorSchemaPipe } from 'src/middlewares/validador.middleware'
-import { desencriptarLlave } from 'src/libs';
+import { decryptKey } from 'src/libs';
 
 // Seguridad
 import { JwtService } from '@nestjs/jwt'
@@ -25,13 +25,13 @@ export class AuthController {
 
   @PublicAccess()
   @Post('loginUser')
-  async login(@Body( new ValidadorSchemaPipe()) body: LoginUserInterface, @Res() res: Response, @Req() req: any){
+  async loginUser(@Body( new ValidadorSchemaPipe()) body: LoginUserInterface, @Res() res: Response, @Req() req: any){
     const userFound:any = await this.userService.findOne({ username : body.username.toString() });
     
     if(!userFound) return res.status(400).json({ message: "Usuario no encontrado."});
 
     const validation = await bcrypt.compare(body.password, userFound.password);
-    if(!validation) return res.status(400).json({message: "Contraseña incorrecta."});
+    if(!validation) return res.status(400).json({ message: "Contraseña incorrecta." });
 
     const token = await this.jwtService.signAsync({ id: userFound._id, role: userFound?.role });
     const statusType = await this.statusTypeService.findOne({ name: 'Activo', type: 'User' });
@@ -45,6 +45,23 @@ export class AuthController {
       role: userFound?.role,
       idPerson: userFound?.idPerson
     });
+  }
+
+  @Post('logoutUser')
+  async logoutUser(@Body() body: any, @Res() res: Response, @Req() req: any) {
+
+    if(body.token){
+      const { id } = await decryptKey(body.token);
+      body.idUser = id;
+    }
+
+    const userFound:any = await this.userService.searchIdUser(body.idUser);
+    if (!userFound) return res.status(400).json({ message: "Usuario no encontrado" });
+
+    res.json({
+      session: false  
+    })
+
   }
 
   // @PublicAccess()
@@ -81,7 +98,7 @@ export class AuthController {
   //   const dataActividad: any = {
   //     actividad: 'login',
   //     schema: 'Usuario',
-  //     idUsuario: userFound._id.toString(),
+  //     idUser: userFound._id.toString(),
   //     statusType: statusType._id.toString(),
   //     data: userFound,
   //     conexionUsuario: {
@@ -103,7 +120,7 @@ export class AuthController {
   //   res.json({
   //     token: token,
   //     id: userFound?.idEmpresa?._id,
-  //     idUsuario:  userFound._id,
+  //     idUser:  userFound._id,
   //     usuario: userFound.nombreUsuario,
   //     email: userFound.correo, 
   //     sedesVisualizadas: userFound.sedesVisualizadas || [], 
@@ -116,47 +133,7 @@ export class AuthController {
   //   })
   // }
 
-  // @Post('logoutUsuario')
-  // async logout(@Body() body: any, @Res() res: Response, @Req() req: any) {
 
-  //   if(body.token){
-  //     const { id } = await desencriptarLlave(body.token);
-  //     body.idUsuario = id;
-  //   }
-
-  //   const userFound:any = await this.userService.buscarId(body.idUsuario);
-  //   if (!userFound) return res.status(400).json({ message: "Usuario no encontrado" });
-
-  //   await this.userService.actualizarOptionalField(userFound?._id, { bool: "0"});
-
-  //   // ACTIVIDAD
-  //   const infoIP = IPAdreessUtil.getInfoIP(req)
-  //   const dataActividad: any = {
-  //     actividad: 'logout',
-  //     schema: 'Usuario',
-  //     idUsuario: userFound._id.toString(),
-  //     statusType: userFound.statusType.toString(),
-  //     conexionUsuario: {
-  //       conectado: false,
-  //       ultimaConexion: new Date()
-  //     },
-  //     data: userFound,
-  //     ip: infoIP.IP,
-  //     dispositivo: infoIP.dispositivo,
-  //     userAgent: infoIP.userAgent
-  //   }
-
-  //   const resLocation = await this.locacionIpService.getLocation(infoIP.IP);
-  //   if(resLocation.status == 200){
-  //     dataActividad.locacion = resLocation.data;
-  //   }
-
-  //   const actividad = await this.actividadService.registrar(dataActividad);
-
-  //   res.json({
-  //     session: false  
-  //   })
-  // }
 
   // @PublicAccess()
   // @Post('registrarUsuario')
@@ -186,7 +163,7 @@ export class AuthController {
   //     const dataActividad: any = {
   //       actividad: 'registri',
   //       schema: 'Usuario',
-  //       idUsuario: usuarioU._id.toString(),
+  //       idUser: usuarioU._id.toString(),
   //       statusType: statusType._id.toString(),
   //       data: usuarioU,
   //       conexionUsuario: {
@@ -245,7 +222,7 @@ export class AuthController {
   //   return res.json({
   //     token: token,
   //     id: usuarioU?.idEmpresa?._id,
-  //     idUsuario:  usuarioU._id,
+  //     idUser:  usuarioU._id,
   //     usuario: usuarioU.nombreUsuario,
   //     email: usuarioU.correo, 
   //     sedesVisualizadas: usuarioU.sedesVisualizadas || [], 

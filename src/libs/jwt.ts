@@ -18,7 +18,7 @@ export function crearLlaveAcceso(payload: any){
 }
 
 
-export function desencriptarLlave(token:string):any{
+export function decryptKey(token:string):any{
     try{
         const t = jwt.verify(token,TOKEN_SECRET);
         return t;

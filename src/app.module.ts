@@ -6,11 +6,13 @@ import { UserModule } from './modules/User/user.module';
 import { AreaModule } from './modules/Area/area.module';
 import { PersonModule } from './modules/Person/person.module';
 import { ConfigModule } from './modules/Config/config.module';
+import { AuthModule } from './modules/auth/auth-user.module';
 
 @Module({
   imports: [
     MongooseModule.forRoot("mongodb+srv://bellezatorresanderson:2yRteAB38FimVOGX@cluster0.mo2lj.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"),
     ApiConsumerModule,
+    AuthModule,
     ConfigModule,
     TakModule,
     UserModule,

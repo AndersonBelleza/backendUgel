@@ -37,6 +37,16 @@ export class StatusTypeController {
     }
   }
 
+  @Post('listTypeAll')
+  async listTypeAll(@Body() body: any, @Req() req: Request){
+    try {
+      const response = await this.service.listAsync( body );
+      return response
+    } catch (error) {
+      throw error;
+    }
+  }
+
   @Put(':id')
   async actualizarStatusType(@Param('id')  id : string, @Body() body: any, @Req() req: Request){
     const res = await this.service.updateStatusType(id, body);

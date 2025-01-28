@@ -12,8 +12,10 @@ export class StatusTypeService {
     return await this.model.find();
   }
 
-  async listAsync ( data : any = {} ){
-    return await this.model.find( data );
+  async listAsync(data: any = {}) {
+    // Se puede validar si `data.type` está presente.
+    const filter = data.type ? { type: data.type } : {};
+    return await this.model.find(filter);
   }
 
   async findOne( data : any ){

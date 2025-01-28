@@ -41,22 +41,44 @@ export class TakController {
     }
   }
 
+  @Post('listByUser')
+  async listTakUserAsync(@Body('idUser') idUser: string, @Body() body: any = {}, @Req() req: Request){
+    try {
+      let skip = 0;
+
+      const { page, limit } = body;
+
+      if(page && limit) skip = page * limit
+
+      return this.service.listByUserAsync({}, skip, limit); // ´Pasar nueva data del body.
+
+    } catch (error) {
+      throw error;
+    }
+
+    try {
+      if (!idUser) {
+        throw new Error('El campo idUser es obligatorio');
+      }
+      const response = await this.service.listByUserAsync(body);
+      return response;
+    } catch (error) {
+      throw error;
+    }
+  }
+
   @Put(':id')
   async actualizar(@Param('id') id: string, @Body() body: any, @Req() req: Request) {
     try {
       // Intentar actualizar el elemento en la base de datos
       const updatedTak = await this.service.updateTak(id, body);
-  
       // Si no se encuentra el elemento, lanzar una excepción
       if (!updatedTak) throw new NotFoundException('Item not found!');
-  
       // Buscar el elemento completo desde la base de datos para garantizar consistencia
       const fullTak = await this.service.findById(id);
       if (!fullTak) throw new NotFoundException('Item not found after update!');
-  
       // Emitir el evento `takUpdated` con los datos completos
       this.gateway.emitEvent('takUpdated', fullTak);
-  
       return fullTak;
     } catch (error) {
       throw error;

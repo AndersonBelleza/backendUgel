@@ -47,7 +47,7 @@ export class TakService {
   
   async createTak(crearTak : object){
     const nuevoTak = await this.TakModel.create(crearTak);
-    return nuevoTak.save();
+    return this.findById(nuevoTak._id.toString());
   }
   
   async deleteTak(id: string){
@@ -73,7 +73,6 @@ export class TakService {
       .populate('idStatusType') // Populate para idStatusType
       .populate('idStatusPriority'); // Populate para idStatusPriority
   }
-
     // Soft delete: marcar un registro como eliminado
     async softDelete(id: string): Promise<boolean> {
       const tak = await this.TakModel.findById(id);
@@ -81,10 +80,48 @@ export class TakService {
         // Si no existe o ya está eliminado, devolver null
         return false;
       }
-  
       tak.isDeleted = true;
       tak.deletedAt = new Date();
       await tak.save(); // Guardar los cambios
       return true; // Retorna true si fue exitoso
+    }
+    
+    async listByUserAsync(body: any, skip: number = 0, limit: any = null) {
+      const totalRecordsQuery = this.TakModel.countDocuments(body);
+    const paginatedResultsQuery = this.TakModel.find(body)
+      // return await this.TakModel.find(body)
+        .sort({ createdAt: -1 })
+        .populate([
+          {
+            path: 'idUser',
+            select: 'username idArea',
+            populate: [
+              {
+                path: 'idArea',
+                select: 'name floorNumber',
+              },
+            ],
+          },
+          {
+            path: 'idStatusType',
+            select: 'color name',
+          },
+          {
+            path: 'idStatusPriority',
+            select: 'color name',
+          },
+        ])
+        .skip(skip)
+        .limit(limit)
+        // .sort({ createdAt: 'desc' })
+        .lean()
+        .exec();
+      return Promise.all([totalRecordsQuery, paginatedResultsQuery])
+      .then(([totalRecords, paginatedResults]) => {
+        return {
+          total: totalRecords,
+          results: paginatedResults
+        };
+      });
     }
 }

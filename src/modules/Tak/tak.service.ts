@@ -12,17 +12,9 @@ export class TakService {
     return await this.TakModel.find();
   }
 
-  async listAsync ( data : any = {} ){
-    const todayStart = new Date();
-    todayStart.setHours(0, 0, 0, 0); // Inicio del día actual
-  
-    const todayEnd = new Date();
-    todayEnd.setHours(23, 59, 59, 999); // Fin del día actual
-    return await this.TakModel.find( data )
-    .find({
-      createdAt: { $gte: todayStart, $lte: todayEnd }, // Filtro por fecha actual
-    })
-    .sort({ createdAt: -1 }) 
+  async listAsync(body: any, skip: number = 0, limit: any = null) {
+    const totalRecordsQuery = this.TakModel.countDocuments(body);
+    const paginatedResultsQuery = this.TakModel.find(body)
     .populate([
       {
         path: 'idUser',
@@ -30,19 +22,32 @@ export class TakService {
         populate: [
           {
             path: 'idArea',
-            select: 'name floorNumber'
-          }
-        ]
+            select: 'name floorNumber',
+          },
+        ],
       },
       {
         path: 'idStatusType',
-        select: 'color name'
+        select: 'name color'
       },
       {
         path: 'idStatusPriority',
-        select: 'color name'
+        select: 'name color'
       }
     ])
+    .skip(skip)
+    .limit(limit)
+    .sort({ createdAt: -1 })      
+    .lean()
+    .exec();
+
+    return Promise.all([totalRecordsQuery, paginatedResultsQuery])
+    .then(([totalRecords, paginatedResults]) => {
+      return {
+        total: totalRecords,
+        results: paginatedResults
+      };
+    });
   }
   
   async createTak(crearTak : object){
@@ -63,15 +68,22 @@ export class TakService {
 
   async findById(id: string) {
     return this.TakModel.findById(id)
-      .populate({
-        path: 'idUser', // Relación principal
-        populate: {
-          path: 'idArea', // Relación dentro de idUser
-          select: 'name floorNumber', // Solo incluye estos campos
-        },
-      })
-      .populate('idStatusType') // Populate para idStatusType
-      .populate('idStatusPriority'); // Populate para idStatusPriority
+      .populate([
+          {
+            path: 'idUser', // Relación principal
+            populate: {
+              path: 'idArea', // Relación dentro de idUser
+              select: 'name floorNumber', // Solo incluye estos campos
+            },
+          },
+          {
+            path: 'idUser', // Relación principal
+            populate: {
+              path: 'idArea', // Relación dentro de idUser
+              select: 'name floorNumber', // Solo incluye estos campos
+            },
+          }
+        ])
   }
     // Soft delete: marcar un registro como eliminado
     async softDelete(id: string): Promise<boolean> {

@@ -126,7 +126,62 @@ export class UserController {
     if(!res) throw new NotFoundException('Item not found!');
     return res;
   }
+
+  @Put('updateUserAndPerson/:id')
+  async updateUserAndPerson(@Param('id')  id : string, @Body() body: any, @Req() req: Request){
+    try {
+      console.log(body)
+      const idProcess = body?.idProcess;
+
+      const dataPerson : any = body;
+
+      const responseStatusType = await this.statusTypeService.findOne( { name: 'Activo', type: 'User' } ); // Aqui irá el estado ACTIVO (Default)
+      if (responseStatusType) body.idStatusType = new Types.ObjectId( responseStatusType?._id.toString() );
+
+      const responsePerson = await this.personService.findOne({ _id : body?.idPerson });
+      
+      //! lÓGICA PARA ACTUALIZAR A UNA PERSONA ( Solo pasará a actualizarse cuando haya un cambio en el nombre de la persona. )
+      if( dataPerson.firstName != responsePerson?.firstName || dataPerson.lastName != responsePerson?.lastName ) {
+        await this.personService.updatePerson(body?.idPerson, dataPerson);
+      } 
+      
+      const dataUser = {
+        username : body.username,
+        role: body.role,
+        dateCreate: new Date().toISOString(),
+        idArea: new mongoose.Types.ObjectId(body.idArea?.toString()),
+        idPerson: body.idPerson
+      };
+
+      const response = await this.service.updateUser(idProcess, dataUser);
+      return response;
+
+    } catch (error) {
+      if(error.code === 11000){
+        throw new ConflictException('The element already exists');
+      }
+      throw error;
+    }
+  }
   
+  @Put('updateUserPassword/:id')
+  async updateUserPassword(@Param('id')  id : string, @Body() body: any, @Req() req: Request){
+    try {
+
+      const passwordEncrypted = await bcrypt.hash( body.password, 15 );
+      const response = await this.service.updateUser( id, { password : passwordEncrypted });
+      if( !response ) return { message : 'Error al cambiar la contraseña'};
+      
+      return response;
+
+    } catch (error) {
+      if(error.code === 11000){
+        throw new ConflictException('The element already exists');
+      }
+      throw error;
+    }
+  }
+
   @Delete(':id')
   @HttpCode(204)
   async deleteUser(@Param('id') id:string, @Req() req: Request){

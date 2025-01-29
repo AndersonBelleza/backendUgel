@@ -33,8 +33,12 @@ export class TakController {
   @Post('listAsync')
   async listAsyncTak(@Body() body: any, @Req() req: Request){
     try {
-      const response = await this.service.listAsync( body );
-      return response
+      let skip = 0;
+      const { page, limit } = body;
+
+      if(page && limit) skip = page * limit
+
+      return this.service.listAsync({}, skip, limit); // ´Pasar nueva data del body.
 
     } catch (error) {
       throw error;
@@ -52,16 +56,6 @@ export class TakController {
 
       return this.service.listByUserAsync({}, skip, limit); // ´Pasar nueva data del body.
 
-    } catch (error) {
-      throw error;
-    }
-
-    try {
-      if (!idUser) {
-        throw new Error('El campo idUser es obligatorio');
-      }
-      const response = await this.service.listByUserAsync(body);
-      return response;
     } catch (error) {
       throw error;
     }

@@ -49,13 +49,20 @@ export class TakController {
   async listTakUserAsync(@Body('idUser') idUser: string, @Body() body: any = {}, @Req() req: Request){
     try {
       let skip = 0;
-
       const { page, limit } = body;
-
       if(page && limit) skip = page * limit
-
       return this.service.listByUserAsync({}, skip, limit); // ´Pasar nueva data del body.
 
+    } catch (error) {
+      throw error;
+    }
+
+    try {
+      if (!idUser) {
+        throw new Error('El campo idUser es obligatorio');
+      }
+      const response = await this.service.listByUserAsync(body);
+      return response;
     } catch (error) {
       throw error;
     }

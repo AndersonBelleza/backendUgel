@@ -107,14 +107,10 @@ export class UserController {
 
   @Put('updateUserStatusType/:id')
   async updateUserStatusType(@Param('id')  id : string, @Body() body: any, @Req() req: Request){
-
     const { nameStatus } = body;
-
     let nameSearch = 'Activo';
     nameStatus == 'Activo' ? nameSearch = 'Inactivo' : 'Activo';
-
     const responseStatusType = await this.statusTypeService.findOne({ name : nameSearch, type: 'User' });
-    
     const res = await this.service.updateUser(id, { idStatusType : new mongoose.Types.ObjectId(responseStatusType?._id.toString())});
     if(!res) throw new NotFoundException('Item not found!');
     return res;

@@ -20,7 +20,7 @@ import { StatusTypeModule } from '../statusType/statusType.module';
   ],
   controllers: [ TakController ],
   providers: [ TakService, WebSocketGateway ],
-    exports: [ TakService ]
+  exports: [ TakService ]
   
 })
 export class TakModule {}

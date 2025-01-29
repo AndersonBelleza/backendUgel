@@ -14,7 +14,7 @@ export class StatusTypeController {
   }
 
   @Post()
-  async crear(@Body() body: any, @Req() req: Request){
+  async create(@Body() body: any, @Req() req: Request){
     try {
       const response = await this.service.createStatusType(body);
       return response
@@ -36,6 +36,17 @@ export class StatusTypeController {
       throw error;
     }
   }
+
+  @Post('searchByType')
+  async searchByType(@Body() body: any, @Req() req: Request){
+    try {
+      const response = await this.service.findAll( { type: body?.type } );
+      return response
+    } catch (error) {
+      throw error;
+    }
+  }
+
 
   @Post('listTypeAll')
   async listTypeAll(@Body() body: any, @Req() req: Request){

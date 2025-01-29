@@ -10,8 +10,20 @@ export class Tak {
   @Prop({default: '0', type: String})
   bool: string;
 
-  @Prop({ type: String})
+  @Prop({ type: String, required: true })
+  issue: string;
+
+  @Prop({ type: String })
   description: string;
+
+  @Prop({ type: String })
+  diagnosis: string;
+
+  @Prop({ type: String })
+  solution: string;
+
+  @Prop({ type: String })
+  recommendation: string;
 
   @Prop({ type: Types.ObjectId, ref: 'User' })
   idUser: Types.ObjectId;
@@ -22,13 +34,6 @@ export class Tak {
   @Prop({ type: Types.ObjectId, ref: 'StatusType' })
   idStatusPriority: Types.ObjectId;
   
-  // Campo para soft delete
-  @Prop({ default: false, type: Boolean })
-  isDeleted: boolean;
-
-  // Campo para la fecha de eliminación
-  @Prop({ type: Date, default: null })
-  deletedAt: Date | null;
 }
 
 export const TakSchema = SchemaFactory.createForClass(Tak);

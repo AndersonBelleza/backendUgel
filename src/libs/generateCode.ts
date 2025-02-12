@@ -27,18 +27,11 @@ export function generarCodigo(longitud: number): string{
     return codigo;
 }
 
-export function convertirFecha(fechaString:any) {
-    var partesFecha = fechaString.split('-');
-    var fecha = new Date(partesFecha[2], partesFecha[1] - 1, partesFecha[0]);
+export function convertDate( dateString:any ) {
+    var partsDate = dateString.split('/');
+    var date = new Date(partsDate[2], partsDate[1] - 1, partsDate[0]);
     
-    return fecha;
-}
-
-export function convertirFecha2(fechaString:any) {
-    var partesFecha = fechaString.split('-');
-    var fecha = new Date(partesFecha[0], partesFecha[1] - 1, partesFecha[2]);
-    
-    return fecha;
+    return date;
 }
 
 export function stripTime(date:any) {
@@ -65,3 +58,11 @@ export function decimalToDMS(deg, isLat) {
 
     return `${degrees}° ${minutes}' ${seconds.toFixed(2)}" ${direction} `;
 }
+
+  
+export function generateCodeIssue(){
+    const date = new Date().toLocaleDateString('en-us', { year:"2-digit", month:"2-digit", day:"2-digit"});
+    var partsDate = date.split('/');
+    const initializeCode = `${partsDate[0]}${partsDate[1]}${partsDate[2]}`;
+    return initializeCode;
+  }

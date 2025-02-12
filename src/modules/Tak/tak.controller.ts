@@ -2,6 +2,7 @@ import { Controller, Get, Post, Body, Param, Delete, HttpCode, NotFoundException
 import { TakService } from './tak.service';
 import { WebSocketGateway } from './tak.gateway';
 import { StatusTypeService } from '../statusType/statusType.service';
+import { convertDate, generateCodeIssue } from 'src/libs';
 
 @Controller('tak')
 export class TakController {
@@ -21,11 +22,27 @@ export class TakController {
   async create(@Body() body: any, @Req() req: Request){
     try {
       const responseStatusType = await this.statusService.findOne({ type: 'Default', name : 'Pendiente' });
-      if( responseStatusType ) body.idStatusType = responseStatusType?._id
+      if( responseStatusType ) body.idStatusType = responseStatusType?._id;
+
+      // ! Asignar codigo por defecto
+      const code = generateCodeIssue();
+
+      const today = new Date();
+      const startOfDay = new Date(today.setHours(0, 0, 0, 0));
+      const endOfDay = new Date(today.setHours(23, 59, 59, 999));
+      const correlative = await this.service.countTak({
+        createdAt: {
+          $gte: startOfDay.toISOString(),
+          $lt: endOfDay.toISOString()
+        }
+      });
+
+      body.code = code;
+      body.correlative = correlative + 1;
 
       const TabuscarTak = await this.service.createTak(body);
 
-      this.gateway.emitEvent('takAdded', TabuscarTak);
+      this.gateway.emitEvent('takAdded', await this.service.listAsync({}));
       return TabuscarTak
     } catch (error) {
       if(error.code === 11000){
@@ -39,11 +56,15 @@ export class TakController {
   async listAsyncTak(@Body() body: any, @Req() req: Request){
     try {
       let skip = 0;
-      const { page, limit } = body;
+      const { page, limit, code, correlative } = body;
+
+      let newData : any = {};
+
+      if( code ) newData.code = code;
+      if( correlative ) newData.correlative = correlative;
 
       if(page && limit) skip = page * limit
-
-      return this.service.listAsync({}, skip, limit); // ´Pasar nueva data del body.
+      return await this.service.listAsync( newData , skip, limit ); // ´Pasar nueva data del body.
 
     } catch (error) {
       throw error;

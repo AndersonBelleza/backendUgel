@@ -49,6 +49,11 @@ export class TakService {
       };
     });
   }
+
+  async countTak ( body : any = { }) {
+    const totalRecordsQuery = this.TakModel.countDocuments(body);
+    return totalRecordsQuery;
+  }
   
   async createTak(crearTak : object){
     const nuevoTak = await this.TakModel.create(crearTak);
@@ -85,18 +90,6 @@ export class TakService {
           }
         ])
   }
-    // // Soft delete: marcar un registro como eliminado
-    // async softDelete(id: string): Promise<boolean> {
-    //   const tak = await this.TakModel.findById(id);
-    //   if (!tak || tak.isDeleted) {
-    //     // Si no existe o ya está eliminado, devolver null
-    //     return false;
-    //   }
-    //   tak.isDeleted = true;
-    //   tak.deletedAt = new Date();
-    //   await tak.save(); // Guardar los cambios
-    //   return true; // Retorna true si fue exitoso
-    // }
     
     async listByUserAsync(body: any, skip: number = 0, limit: any = null) {
       const totalRecordsQuery = this.TakModel.countDocuments(body);

@@ -10,6 +10,12 @@ export class Tak {
   @Prop({default: '0', type: String})
   bool: string;
 
+  @Prop({ default: '0', type: String })
+  code: string;
+  
+  @Prop({ default: '0', type: String })
+  correlative: string;
+
   @Prop({ type: String, required: true })
   issue: string;
 

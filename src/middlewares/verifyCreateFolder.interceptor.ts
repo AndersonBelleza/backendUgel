@@ -19,7 +19,6 @@
 //       directoryPath = request.query.pathFile as string;
 //     }
 
-//     console.log("EL DIRECTORIO ES:", directoryPath)
 //     if (!directoryPath) {
 //       throw new BadRequestException('No se especificó el directorio.');
 //     }

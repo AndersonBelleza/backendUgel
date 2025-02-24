@@ -10,7 +10,6 @@ export class DynamicStorageInterceptor implements NestInterceptor {
   intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
     const request = context.switchToHttp().getRequest();
     const { pathFile } = request.body;
-    console.log("EL PATH ES:", pathFile)
     
     return next.handle().pipe(
       map((data) => {

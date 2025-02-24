@@ -144,7 +144,6 @@ export class AuthController {
   //     const statusType = await this.statusTypeService.statusTypeNombre('Activo');
   //     const tipoUsuario = await this.tipouserService.buscarTipoUsuarioNombre('Default');
   //     const sede:any = await this.sedeService.obtenerSede(body.idSede.toString());
-  //     console.log(sede.idEmpresa._id);
       
   //     const Sendbody:any = {
   //       ...body, 

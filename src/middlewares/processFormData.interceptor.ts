@@ -13,7 +13,6 @@ export class PreprocessFormDataInterceptor implements NestInterceptor {
         if (err) {
           reject(err);
         } else {
-            console.log("REQUEST:", request.body)
           resolve(next.handle());
         }
       });

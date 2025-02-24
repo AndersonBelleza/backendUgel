@@ -126,7 +126,6 @@ export class UserController {
   @Put('updateUserAndPerson/:id')
   async updateUserAndPerson(@Param('id')  id : string, @Body() body: any, @Req() req: Request){
     try {
-      console.log(body)
       const idProcess = body?.idProcess;
 
       const dataPerson : any = body;

@@ -5,7 +5,7 @@ import { UpdateApiConsumerDto } from './dto/update-api-consumer.dto';
 import { catchError, lastValueFrom, map, throwError, tap } from 'rxjs'
 import { HttpService } from '@nestjs/axios'
 
-@Controller('api-consumer')
+@Controller('apiConsumer')
 export class ApiConsumerController {
   constructor(
     private  apiConsumerService: ApiConsumerService,
@@ -25,7 +25,7 @@ export class ApiConsumerController {
 
   // BUSCAR DATOS DNI
   @Get('searchDni/:dni')
-  async searchDni(@Param('dni') dni: string,@Param('token') token: string,) {
+  async searchDni(@Param('dni') dni: string, @Param('token') token: string,) {
     const responseData = await lastValueFrom(this.httpService.get('https://app.minam.gob.pe/TransparenciaWSREST/tramites/transparencia/persona?dni=' + dni,
       {
         responseType: 'json',
@@ -34,7 +34,6 @@ export class ApiConsumerController {
         }
       }).pipe(
         map((response) => {
-          console.log("response",response);
           return response.data
         }),
         catchError((error) => {
@@ -43,9 +42,9 @@ export class ApiConsumerController {
       )
     );
 
-    console.log("responseData",responseData);
     return responseData;
   }
+
   // BUSCAR DATOS DNI BLOC NOTAS
   @Get('searchDniV2/:dni')
   async searchDniV2(@Param('dni') dni: string,@Param('token') token: string,) {
@@ -59,8 +58,9 @@ export class ApiConsumerController {
         }
       }).pipe(
         map((response) => {
-          console.log("response",response);
           return response.data
+          console.log(response)
+
         }),
         catchError((error) => {
           return `Error al procesar la respuesta: ${error.message}`;
@@ -68,7 +68,6 @@ export class ApiConsumerController {
       )
     );
 
-    console.log("responseData",responseData);
     return responseData;
   }
 
@@ -84,7 +83,6 @@ export class ApiConsumerController {
         }
       }).pipe(
         map((response) => {
-          console.log("response",response);
           return response.data
         }),
         catchError((error) => {
@@ -93,7 +91,6 @@ export class ApiConsumerController {
       )
     );
 
-    console.log("responseData",responseData);
     return responseData;
   }
   // BUSCAR DATOS RUC EMPRESA BLOC NOTAS
@@ -109,7 +106,6 @@ export class ApiConsumerController {
         }
       }).pipe(
         map((response) => {
-          console.log("response",response);
           return response.data
         }),
         catchError((error) => {
@@ -118,7 +114,6 @@ export class ApiConsumerController {
       )
     );
 
-    console.log("responseData",responseData);
     return responseData;
   }
 
@@ -135,7 +130,6 @@ export class ApiConsumerController {
         }
       }).pipe(
         map((response) => {
-          console.log("response",response);
           return response.data
         }),
         catchError((error) => {
@@ -144,7 +138,6 @@ export class ApiConsumerController {
       )
     );
 
-    console.log("responseData",responseData);
     return responseData;
   }
 
@@ -162,7 +155,6 @@ export class ApiConsumerController {
         }
       }).pipe(
         map((response) => {
-          console.log("response",response);
           return response.data
         }),
         catchError((error) => {
@@ -171,7 +163,6 @@ export class ApiConsumerController {
       )
     );
 
-    console.log("responseData",responseData);
     return responseData;
   }
   //CONSULTAr BOLETA
@@ -187,7 +178,6 @@ export class ApiConsumerController {
         }
       }).pipe(
         map((response) => {
-          console.log("response",response);
           return response.data
         }),
         catchError((error) => {
@@ -196,19 +186,14 @@ export class ApiConsumerController {
       )
     );
 
-    console.log("responseData",responseData);
     return responseData;
   }
-
-  
-
 
   @Get('getTokenSunat')
   async getTokenSunat() {
 
     let token = await this.apiConsumerService.createCacheTokenSunatGRE();
 
-    console.log("responseData",token);
     return token;
   }
 

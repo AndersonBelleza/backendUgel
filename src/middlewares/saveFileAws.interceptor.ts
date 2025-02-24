@@ -20,7 +20,6 @@
 //       directoryPath = query.pathFile as string;
 //     }
 
-//     console.log("DIRECTORIO:", directoryPath);
 
 //     if (!directoryPath) {
 //       directoryPath = 'demo'
@@ -57,7 +56,6 @@
 //       // switchMap((res) => res),
 //       switchMap((res) => {
 //         // Aquí puedes acceder a los datos del request después de la carga de archivos
-//         console.log(request.body);
 //         return next.handle();
 //       }),
 //       catchError((error) => {

@@ -73,7 +73,6 @@ export class ApiConsumerService {
       // await this.cacheManager.set("tokenGRE", token);
       return token;
     } catch (error) {
-      console.log("Error", error);
       await browser.close()
       return undefined;
     }

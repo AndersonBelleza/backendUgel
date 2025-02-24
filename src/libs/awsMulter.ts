@@ -125,7 +125,6 @@
 //     },
 //     key: (req: any, file: any, cb) => {
 //         let pathFile = req.body?.pathFile;
-//         // console.log("EL PATH ES:", pathFile)
 
 //         if (!pathFile) {
 //             pathFile = 'demo/formdata30_07_2024';
@@ -141,7 +140,7 @@
 //     fileFilter: (req, file, callback) => {
 //         const ext = extname(file.originalname);
 //         const allowedExtensions = ['.jpg', '.jpeg', '.png', '.pdf', '.xlsx'];
-//         // console.log("REQ ES:", req?.body)
+//         // ("REQ ES:", req?.body)
 
 //         if (allowedExtensions.includes(ext.toLowerCase())) {
 //             callback(null, true);
@@ -154,13 +153,13 @@
 //         bucket: BUCKET_NAME,
 //         acl: ObjectCannedACL.public_read,
 //         metadata: (req, file, cb) => {
-//             // console.log("MDTA REQ ES:", req)
+//             // ("MDTA REQ ES:", req)
 //             cb(null, { fieldname: file.fieldname });
 //         },
 //         key: async (req: any, file, cb) => {
 //             // Obtener algún atributo del FormData para determinar el path
 //             let pathFile = req?.body?.pathFile; // Usa el atributo que necesites del FormData
-//             // console.log("FILES ES:", pathFile, path)
+//             // ("FILES ES:", pathFile, path)
 
 //             if (!pathFile) {
 //                 pathFile = 'NotFound';
@@ -585,7 +584,7 @@
 //     try {
 //         // Asegurarse de que el prefix tenga '/' al final
 //         const normalizedPath  = ensureTrailingSlash(path)
-//         // console.log("ENSURE PATH:", normalizedPath)
+//         // ("ENSURE PATH:", normalizedPath)
 //         const res = await s3Client.send(new ListObjectsV2Command({
 //             Bucket: BUCKET_NAME,
 //             Prefix: normalizedPath ,
@@ -593,7 +592,7 @@
 //             MaxKeys: 1 // Solo necesitamos un objeto para verificar si la carpeta existe
 //         }));
 
-//         // console.log("RES VERIFY: ", res)
+//         // ("RES VERIFY: ", res)
 
 //         if (res.Contents && res.Contents.length > 0) {
 //             return { exists: true, message: `La carpeta '${path}' existe.` };
@@ -632,7 +631,7 @@
 //             data: res // Incluye la respuesta del comando PutObject
 //         };
 //     } catch (error) {
-//         console.log("error ",error);
+//         ("error ",error);
         
 //         return {
 //             success: false,
@@ -778,11 +777,11 @@
 //                 };
 
 //                 await s3Client.send(new CopyObjectCommand(copyParams));
-//                 // console.log(`Copiado: ${sourceKey} a ${destinationKey}`);
+//                 // (`Copiado: ${sourceKey} a ${destinationKey}`);
 //             }
 //         }
 
-//         // console.log(`Copia de la carpeta '${sourceFolder}' a '${destinationFolder}' completada.`);
+//         // (`Copia de la carpeta '${sourceFolder}' a '${destinationFolder}' completada.`);
 //         return { success: true, message: `Copia de la carpeta '${sourceFolder}' a '${destinationFolder}' completada.` };
 //     } catch (error) {
 //         console.error('Error al copiar la carpeta:', error);

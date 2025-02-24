@@ -7,6 +7,7 @@ import { AreaModule } from './modules/Area/area.module';
 import { PersonModule } from './modules/Person/person.module';
 import { ConfigModule } from './modules/Config/config.module';
 import { AuthModule } from './modules/auth/auth-user.module';
+import { DoorControlModule } from './modules/DoorControl/doorControl.module';
 
 @Module({
   imports: [
@@ -17,7 +18,8 @@ import { AuthModule } from './modules/auth/auth-user.module';
     TakModule,
     UserModule,
     AreaModule,
-    PersonModule
+    PersonModule,
+    DoorControlModule
   ],
   controllers: [],
   providers: [],

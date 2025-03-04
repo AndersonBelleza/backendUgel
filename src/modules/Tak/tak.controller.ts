@@ -3,6 +3,7 @@ import { TakService } from './tak.service';
 import { WebSocketGateway } from './tak.gateway';
 import { StatusTypeService } from '../statusType/statusType.service';
 import { convertDate, generateCodeIssue } from 'src/libs';
+import mongoose from 'mongoose';
 
 @Controller('tak')
 export class TakController {
@@ -56,15 +57,17 @@ export class TakController {
   async listAsyncTak(@Body() body: any, @Req() req: Request){
     try {
       let skip = 0;
-      const { page, limit, code, correlative } = body;
+      const { page, limit, code, correlative, idArea, idStatusPriority } = body;
 
       let newData : any = {};
 
       if( code ) newData.code = code;
       if( correlative ) newData.correlative = correlative;
-
+      if( idArea ) newData['idUser.idArea'] = idArea; // Aún no funciona porque el idArea está dentro de User 
+      if( idStatusPriority ) newData.idStatusPriority = idStatusPriority
+      console.log(newData)
       if(page && limit) skip = page * limit
-      return await this.service.listAsync( newData , skip, limit ); // ´Pasar nueva data del body.
+      return await this.service.listAsync( newData , skip, limit );
 
     } catch (error) {
       throw error;

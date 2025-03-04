@@ -86,6 +86,21 @@ export class DoorControlController {
     return res;
   }
 
+  @Put('updateFinallyDoorControlForPerson/:id')
+  async updateFinallyDoorControlForPerson(@Param('id') id: string, @Body() body: any, @Req() req: Request) {
+    const codeGenerate = generateCodeIssue();
+  
+    const res : any = await this.service.findOne({ code: codeGenerate });
+    if (!res) throw new NotFoundException('Item not found!');
+  
+    const personIndex = res.peoples.findIndex(( person : any ) => person.id === id);
+
+    res.peoples[personIndex].departureTime = body.departureTime;
+
+    return await this.service.updateDoorControl(res?._id, { peoples : res.peoples })
+  }
+  
+
   @Put(':id')
   async actualizarDoorControl(@Param('id')  id : string, @Body() body: any, @Req() req: Request){
     const res = await this.service.updateDoorControl(id, body);

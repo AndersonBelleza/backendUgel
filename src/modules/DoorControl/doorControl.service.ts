@@ -45,50 +45,36 @@ export class DoorControlService {
       });
   }
 
-  async listAsyncDoorControlOfPerson(body: any, skip: number = 0, limit: any = null) {
-    // Paso 1: Contar el total de elementos en el array 'peoples'
+  async listAsyncDoorControlOfPerson(body: any, query: any, skip: number = 0, limit: any = null) {
+    // Contar el total de registros dentro de 'peoples' que cumplen la condición
     const totalRecordsQuery = this.model.aggregate([
-      { $match: body }, // Filtra los documentos según el cuerpo
-      { $unwind: "$peoples" }, // Deshacer el array PEOPLES
-      { $count: "total" } // Contar los elementos deshechos
+      { $match: body }, // Filtrar documentos principales
+      { $unwind: "$peoples" }, // Desglosar el array 'peoples'
+      { $match: query }, // Aplicar filtro en 'peoples'
+      { $count: "total" } // Contar coincidencias
     ]);
   
-    // Paso 2: Obtener los resultados paginados para 'peoples' y hacer el populate de 'idArea'
+    // Obtener los resultados paginados dentro de 'peoples'
     const paginatedResultsQuery = this.model.aggregate([
-      { $match: body }, // Filtra los documentos según el cuerpo
-      { $unwind: "$peoples" }, // Deshacer el array PEOPLES
-      { $skip: skip }, // Salta los primeros 'skip' elementos
-      { $limit: limit }, // Limita los resultados a 'limit'
-      { $sort: { createdAt: -1 } }, // Ordena los resultados por 'createdAt' en orden descendente
-      { $lookup: { 
-          from: 'Area', 
-          localField: 'peoples.idArea',
-          foreignField: '_id',
-          as: 'idArea'
-        }
-      },
-      { 
-        $group: {
-          _id: null, // Agrupar todo en un solo documento
-          peoples: { $push: "$peoples" } // Volver a agrupar solo 'peoples'
-        }
-      },
-      { 
-        $project: { 
-          _id: 0, // No incluir el _id del documento
-          peoples: 1 // Incluir solo el array de 'peoples'
-        }
-      }
+      { $match: body }, // Filtrar documentos principales
+      { $unwind: "$peoples" }, // Desglosar 'peoples'
+      { $match: query }, // Filtrar elementos dentro de 'peoples'
+      { $sort: { "peoples.createdAt": -1 } }, // Ordenar los resultados
+      { $skip: skip }, // Aplicar paginación
+      { $limit: limit }, // Limitar los resultados
+
+      { $project: { _id: 0, peoples: 1 } } // Mantener solo 'peoples'
     ]);
   
-    // Paso 3: Combinar los resultados y devolverlos
-    return Promise.all([totalRecordsQuery, paginatedResultsQuery])
-      .then(([totalRecords, paginatedResults]) => {
+    // Ejecutar ambas consultas en paralelo y devolver los resultados
+    return Promise.all([totalRecordsQuery, paginatedResultsQuery]).then(
+      ([totalRecords, paginatedResults]) => {
         return {
-          total: totalRecords.length > 0 ? totalRecords[0].total : 0, // Total de elementos en PEOPLES
-          results: paginatedResults.length > 0 ? paginatedResults[0].peoples : [] // Solo devolver el array de 'peoples'
+          total: totalRecords.length > 0 ? totalRecords[0].total : 0,
+          results: paginatedResults.map(item => item.peoples)
         };
-      });
+      }
+    );
   }
   
   async findOne(data: any = {}) {

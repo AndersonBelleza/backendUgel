@@ -43,7 +43,8 @@ export class AuthController {
       id: userFound._id,
       username: userFound.username,
       role: userFound?.role,
-      idPerson: userFound?.idPerson
+      idPerson: userFound?.idPerson,
+      idArea: userFound?.idArea
     });
   }
 

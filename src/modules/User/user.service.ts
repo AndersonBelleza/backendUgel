@@ -46,10 +46,16 @@ export class UserService {
 
   async findOne(data: any = {}) {
     return await this.model.findOne(data)
-    .populate({
-      path: 'idPerson',
-      select: 'firstName lastName',
-    });
+    .populate([
+      {
+        path: 'idPerson',
+        select: 'firstName lastName',
+      },
+      {
+        path: 'idArea',
+        select: 'name floorNumber',
+      }
+    ]);
   }
 
   async searchIdUser(id: string) {

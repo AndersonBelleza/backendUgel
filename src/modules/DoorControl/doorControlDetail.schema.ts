@@ -1,5 +1,6 @@
 import { SchemaFactory, Prop, Schema } from "@nestjs/mongoose";
 import { Types } from "mongoose";
+import { Derivations } from "./derivations.schema";
 
 @Schema({
   timestamps: true,
@@ -33,11 +34,14 @@ export class DoorControlDetail {
   @Prop({ type: Types.ObjectId, ref: 'Area' })
   idArea: Types.ObjectId;
 
-  @Prop({ type: String })
-  entryTime?: any;
+  @Prop({ type: Date })
+  entryTime?: Date;
 
-  @Prop({ type: String })
-  departureTime?: any;
+  @Prop({ type: Date })
+  departureTime?: Date;
+  
+  @Prop({ type: [ Derivations ] })
+  derivations: [ Derivations ];
   
 }
 

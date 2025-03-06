@@ -9,7 +9,7 @@ async function bootstrap() {
   app.enableCors({ 
     allowedHeaders: ["*"], 
     // origin: ["https://semi.nom.pe", /^http?:\/\/localhost:\d+$/, "https://www.semi.nom.pe"],
-    origin: [/^http?:\/\/localhost:\d+$/],
+    origin: [/^http?:\/\/172.16.14.223:\d+$/],
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE"]
   });

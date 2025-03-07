@@ -18,6 +18,38 @@ export class StatusTypeService {
     return await this.model.find(filter);
   }
 
+  async listStatusAsync(body: any, skip: number = 0, limit: any = null) {
+    const totalRecordsQuery = this.model.countDocuments(body);
+    const paginatedResultsQuery = this.model.find(body)
+      // .populate([
+      //   {
+      //     path: 'idStatusType',
+      //     select: 'name color'
+      //   },
+      //   {
+      //     path: 'idPerson',
+      //     select: 'firstName lastName'
+      //   },
+      //   {
+      //     path: 'idArea',
+      //     select: 'name floorNumber'
+      //   },
+      // ])
+      .skip(skip)
+      .limit(limit)
+      .sort({ createdAt: 'desc' })
+      .lean()
+      .exec();
+
+    return Promise.all([totalRecordsQuery, paginatedResultsQuery])
+      .then(([totalRecords, paginatedResults]) => {
+        return {
+          total: totalRecords,
+          results: paginatedResults
+        };
+      });
+  }
+
   async findOne( data : any ){
     return await this.model.findOne(data);
   }

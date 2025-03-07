@@ -58,6 +58,22 @@ export class StatusTypeController {
     }
   }
 
+  @Post('listAsyncStatus')
+  async listAsyncStatus(@Body() body: any, @Req() req: Request){
+    try {
+      let skip = 0;
+
+      const { page, limit } = body;
+
+      if(page && limit) skip = page * limit
+
+      return this.service.listStatusAsync({}, skip, limit); // ´Pasar nueva data del body.
+
+    } catch (error) {
+      throw error;
+    }
+  }
+
   @Put(':id')
   async actualizarStatusType(@Param('id')  id : string, @Body() body: any, @Req() req: Request){
     const res = await this.service.updateStatusType(id, body);

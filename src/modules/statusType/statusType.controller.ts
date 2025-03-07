@@ -13,7 +13,7 @@ export class StatusTypeController {
     
   }
 
-  @Post()
+  @Post('createStatusType')
   async create(@Body() body: any, @Req() req: Request){
     try {
       const response = await this.service.createStatusType(body);
@@ -89,3 +89,4 @@ export class StatusTypeController {
     return res;
   }
 }
+ 

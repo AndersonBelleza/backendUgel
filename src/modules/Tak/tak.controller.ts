@@ -1,9 +1,13 @@
-import { Controller, Get, Post, Body, Param, Delete, HttpCode, NotFoundException, Req, Put, ConflictException } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Delete, HttpCode, NotFoundException, Req, Put, ConflictException, UseInterceptors, UploadedFiles } from '@nestjs/common';
 import { TakService } from './tak.service';
 import { WebSocketGateway } from './tak.gateway';
 import { StatusTypeService } from '../statusType/statusType.service';
 import { convertDate, generateCodeIssue } from 'src/libs';
 import mongoose from 'mongoose';
+import { FileFieldsInterceptor } from '@nestjs/platform-express';
+import { extname } from 'path';
+import { randomUUID } from 'crypto';
+import { diskStorage } from 'multer';
 
 @Controller('tak')
 export class TakController {
@@ -65,7 +69,6 @@ export class TakController {
       if( correlative ) newData.correlative = correlative;
       if( idArea ) newData['idUser.idArea'] = idArea; // Aún no funciona porque el idArea está dentro de User 
       if( idStatusPriority ) newData.idStatusPriority = idStatusPriority
-      console.log(newData)
       if(page && limit) skip = page * limit
       return await this.service.listAsync( newData , skip, limit );
 
@@ -97,16 +100,75 @@ export class TakController {
     }
   }
 
-  @Put('update/:id')
-  async update(@Param('id') id: string, @Body() body: any, @Req() req: Request) {
+  @Post('update/')
+  @UseInterceptors(
+    FileFieldsInterceptor([
+      { name: 'files', maxCount: 100 },
+    ], {
+      fileFilter: (req, file, callback) => {
+        // Obtener la extensión del archivo
+        const ext = extname(file.originalname);
+ 
+        // Lista de extensiones permitidas
+        const allowedExtensions = ['.jpg', '.jpeg', '.png', '.pdf', '.xlsx'];
+
+        // Verificar si la extensión está en la lista de extensiones permitidas
+        if (allowedExtensions.includes(ext.toLowerCase())) {
+          // El archivo es permitido
+          callback(null, true);
+        } else {
+          // El archivo no es permitido
+          callback(new Error('Tipo de archivo no permitido'), false);
+        }
+      },
+      storage: diskStorage({
+        destination: (req, file, callback) => {
+          // Define la ruta de destino en función del tipo de archivo
+          var destinationPath = "";
+          if (file.fieldname === 'files') {
+            destinationPath = 'src/assets/files/tak/';
+          }
+          callback(null, destinationPath);
+        },
+        filename: (req, file, callback) => {
+          const randomName = randomUUID();
+          callback(null, `${randomName}${extname(file.originalname)}`);
+        },
+      }),
+    }),
+  )
+  async update(@UploadedFiles() files: { files?: any[] }, @Body() body: any, @Req() req: Request) {
     try {
-      const updatedTak = await this.service.updateTak(id, body);
+      var data: any = {};
+      for (const prop in body) {
+        if (typeof body[prop] === "string" && body[prop].trim() !== "" && body[prop] !== 'undefined') {
+          data[prop] = JSON.parse(body[prop]);
+        } else {
+          data[prop] = body[prop];
+        }
+      }
+      
+      const id = JSON.parse(body.id);
+
+      if (files?.files?.length > 0) {
+        let evidence : any[] = files?.files?.map((img) => {
+          return {
+            name: img.filename,
+            type: img.mimetype,
+            url: img.path,
+          }
+        });
+        data.evidence = evidence;
+      } 
+
+      const updatedTak = await this.service.updateTak(id, data);
       if (!updatedTak) throw new NotFoundException('Item not found!');
 
       const fullTak = await this.service.findById(id);
       if (!fullTak) throw new NotFoundException('Item not found after update!');
       this.gateway.emitEvent('takUpdated', fullTak);
       return fullTak;
+
     } catch (error) {
       throw error;
     }

@@ -33,6 +33,10 @@ export class TakService {
       {
         path: 'idStatusPriority',
         select: 'name color'
+      },
+      {
+        path: 'idTimePeriod',
+        select: 'name color'
       }
     ])
     .skip(skip)
@@ -91,42 +95,42 @@ export class TakService {
         ])
   }
     
-    async listByUserAsync(body: any, skip: number = 0, limit: any = null) {
-      const totalRecordsQuery = this.TakModel.countDocuments(body);
-    const paginatedResultsQuery = this.TakModel.find(body)
-      // return await this.TakModel.find(body)
-        .sort({ createdAt: -1 })
-        .populate([
-          {
-            path: 'idUser',
-            select: 'username idArea',
-            populate: [
-              {
-                path: 'idArea',
-                select: 'name floorNumber',
-              },
-            ],
-          },
-          {
-            path: 'idStatusType',
-            select: 'color name',
-          },
-          {
-            path: 'idStatusPriority',
-            select: 'color name',
-          },
-        ])
-        .skip(skip)
-        .limit(limit)
-        // .sort({ createdAt: 'desc' })
-        .lean()
-        .exec();
-      return Promise.all([totalRecordsQuery, paginatedResultsQuery])
-      .then(([totalRecords, paginatedResults]) => {
-        return {
-          total: totalRecords,
-          results: paginatedResults
-        };
-      });
-    }
+  async listByUserAsync(body: any, skip: number = 0, limit: any = null) {
+    const totalRecordsQuery = this.TakModel.countDocuments(body);
+  const paginatedResultsQuery = this.TakModel.find(body)
+    // return await this.TakModel.find(body)
+      .sort({ createdAt: -1 })
+      .populate([
+        {
+          path: 'idUser',
+          select: 'username idArea',
+          populate: [
+            {
+              path: 'idArea',
+              select: 'name floorNumber',
+            },
+          ],
+        },
+        {
+          path: 'idStatusType',
+          select: 'color name',
+        },
+        {
+          path: 'idStatusPriority',
+          select: 'color name',
+        },
+      ])
+      .skip(skip)
+      .limit(limit)
+      // .sort({ createdAt: 'desc' })
+      .lean()
+      .exec();
+    return Promise.all([totalRecordsQuery, paginatedResultsQuery])
+    .then(([totalRecords, paginatedResults]) => {
+      return {
+        total: totalRecords,
+        results: paginatedResults
+      };
+    });
+  }
 }

@@ -40,6 +40,12 @@ export class Tak {
   @Prop({ type: Types.ObjectId, ref: 'StatusType' })
   idStatusPriority: Types.ObjectId;
   
+  @Prop({ type: Types.ObjectId, ref: 'StatusType' })
+  idTimePeriod: Types.ObjectId;
+
+  @Prop({default: [], type: [Object]})
+  evidence?: [];
+  
 }
 
 export const TakSchema = SchemaFactory.createForClass(Tak);

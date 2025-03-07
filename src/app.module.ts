@@ -9,6 +9,8 @@ import { ConfigModule } from './modules/Config/config.module';
 import { AuthModule } from './modules/auth/auth-user.module';
 import { DoorControlModule } from './modules/DoorControl/doorControl.module';
 
+import { ImagesController, MakeImagesController, FilesController, FileController } from './modules/images/images.controller'
+
 @Module({
   imports: [
     MongooseModule.forRoot("mongodb+srv://bellezatorresanderson:2yRteAB38FimVOGX@cluster0.mo2lj.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"),
@@ -21,7 +23,7 @@ import { DoorControlModule } from './modules/DoorControl/doorControl.module';
     PersonModule,
     DoorControlModule
   ],
-  controllers: [],
+  controllers: [ ImagesController ],
   providers: [],
 })
 export class AppModule {}

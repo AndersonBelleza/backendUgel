@@ -24,12 +24,71 @@ export class TakController {
   }
 
   @Post()
-  async create(@Body() body: any, @Req() req: Request){
+  @UseInterceptors(
+    FileFieldsInterceptor([
+      { name: 'files', maxCount: 100 },
+    ], {
+      fileFilter: (req, file, callback) => {
+        // Obtener la extensión del archivo
+        const ext = extname(file.originalname);
+ 
+        // Lista de extensiones permitidas
+        const allowedExtensions = ['.jpg', '.jpeg', '.png'];
+
+        // Verificar si la extensión está en la lista de extensiones permitidas
+        if (allowedExtensions.includes(ext.toLowerCase())) {
+          // El archivo es permitido
+          callback(null, true);
+        } else {
+          // El archivo no es permitido
+          callback(new Error('Tipo de archivo no permitido'), false);
+        }
+      },
+      storage: diskStorage({
+        destination: (req, file, callback) => {
+          // Define la ruta de destino en función del tipo de archivo
+          var destinationPath = "";
+          if (file.fieldname === 'files') {
+            destinationPath = 'src/assets/files/tak/';
+          }
+          callback(null, destinationPath);
+        },
+        filename: (req, file, callback) => {
+          const randomName = randomUUID();
+          callback(null, `${randomName}${extname(file.originalname)}`);
+        },
+      }),
+    }),
+  )
+  async create(@UploadedFiles() files: { files?: any[] }, @Body() body: any, @Req() req: Request){
     try {
+
+      var data: any = {};
+
+      for (const prop in body) {
+        if (typeof body[prop] === "string" && body[prop].trim() !== "" && body[prop] !== 'undefined') {
+          data[prop] = JSON.parse(body[prop]);
+        } else {
+          data[prop] = body[prop];
+        }
+      }
+
       const responseStatusType = await this.statusService.findOne({ type: 'Default', name : 'Pendiente' });
-      if( responseStatusType ) body.idStatusType = responseStatusType?._id;
-       
-      const { idUser, idStatusPriority } = body;
+      if( responseStatusType ) data.idStatusType = responseStatusType?._id;
+        
+      const { idUser, idStatusPriority } = data;
+
+            
+      if (files?.files?.length > 0) {
+        let evidence : any[] = files?.files?.map((img) => {
+          return {
+            name: img.filename,
+            type: img.mimetype,
+            url: img.path,
+          }
+        });
+        data.evidence = evidence
+      } 
 
       // ! Asignar codigo por defecto
       const code = generateCodeIssue();
@@ -44,12 +103,12 @@ export class TakController {
         }
       });
 
-      body.code = code;
-      body.correlative = correlative + 1;
-      if( idUser ) body.idUser = new mongoose.Types.ObjectId(idUser);
-      if( idStatusPriority ) body.idStatusPriority = new mongoose.Types.ObjectId(idStatusPriority);
-      
-      const TabuscarTak = await this.service.createTak(body);
+      data.code = code;
+      data.correlative = correlative + 1;
+      if( idUser ) data.idUser = new mongoose.Types.ObjectId(idUser);
+      if( idStatusPriority ) data.idStatusPriority = new mongoose.Types.ObjectId(idStatusPriority);
+
+      const TabuscarTak = await this.service.createTak(data);
 
       this.gateway.emitEvent('takAdded', await this.service.listAsync({}));
       return TabuscarTak
@@ -122,7 +181,7 @@ export class TakController {
         const ext = extname(file.originalname);
  
         // Lista de extensiones permitidas
-        const allowedExtensions = ['.jpg', '.jpeg', '.png', '.pdf', '.xlsx'];
+        const allowedExtensions = ['.jpg', '.jpeg', '.png'];
 
         // Verificar si la extensión está en la lista de extensiones permitidas
         if (allowedExtensions.includes(ext.toLowerCase())) {
@@ -152,6 +211,7 @@ export class TakController {
   async update(@UploadedFiles() files: { files?: any[] }, @Body() body: any, @Req() req: Request) {
     try {
       var data: any = {};
+
       for (const prop in body) {
         if (typeof body[prop] === "string" && body[prop].trim() !== "" && body[prop] !== 'undefined') {
           data[prop] = JSON.parse(body[prop]);
@@ -159,7 +219,7 @@ export class TakController {
           data[prop] = body[prop];
         }
       }
-      
+
       const id = JSON.parse(body.id);
 
       // Buscamos el TAK.

@@ -18,11 +18,15 @@ export class TakService {
     .populate([
       {
         path: 'idUser',
-        select: 'username idArea',
+        select: 'username idArea idPerson',
         populate: [
           {
             path: 'idArea',
             select: 'name floorNumber',
+          },
+          {
+            path: 'idPerson',
+            select: 'firstName lastName',
           },
         ],
       },

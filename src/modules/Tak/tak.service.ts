@@ -49,13 +49,29 @@ export class TakService {
     .lean()
     .exec();
 
-    return Promise.all([totalRecordsQuery, paginatedResultsQuery])
-    .then(([totalRecords, paginatedResults]) => {
-      return {
-        total: totalRecords,
-        results: paginatedResults
-      };
+    const [totalRecords, paginatedResults] = await Promise.all([
+      totalRecordsQuery,
+      paginatedResultsQuery
+    ]);
+    
+    // Ordenar primero por 'En Proceso'
+    const sortedResults = paginatedResults.sort((a : any, b : any) => {
+      const statusA = a?.idStatusType?.name === 'En Proceso' ? 0 : 1;
+      const statusB = b?.idStatusType?.name === 'En Proceso' ? 0 : 1;
+      
+      if (statusA !== statusB) {
+        return statusA - statusB; // Si uno es 'En Proceso', va primero
+      }
+    
+      // Si ambos son iguales, ordenar por fecha de creación (descendente)
+      return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
     });
+    
+    return {
+      total: totalRecords,
+      results: sortedResults
+    };
+    
   }
 
   async countTak ( body : any = { }) {

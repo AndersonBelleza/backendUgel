@@ -78,7 +78,6 @@ export class TakController {
         
       const { idUser, idStatusPriority } = data;
 
-            
       if (files?.files?.length > 0) {
         let evidence : any[] = files?.files?.map((img) => {
           return {
@@ -110,8 +109,9 @@ export class TakController {
 
       const TabuscarTak = await this.service.createTak(data);
 
-      this.gateway.emitEvent('takAdded', await this.service.listAsync({}));
+      this.gateway.emitEvent('takAdded', await this.listAsyncTak({}));
       return TabuscarTak
+      
     } catch (error) {
       if(error.code === 11000){
         throw new ConflictException('The element already exists');
@@ -121,7 +121,7 @@ export class TakController {
   }
 
   @Post('listAsync')
-  async listAsyncTak(@Body() body: any, @Req() req: Request){
+  async listAsyncTak(@Body() body: any, @Req() req?: Request){
     try {
       let skip = 0;
       const { page, limit, code, correlative, idStatusType, idStatusPriority, idUser } = body;
@@ -136,8 +136,15 @@ export class TakController {
       if( idStatusType ) {
         newData.idStatusType = new mongoose.Types.ObjectId(idStatusType);
       }else {
-        const responseDefault = await this.statusService.findOne({ name : 'Pendiente' , type : 'Default' });
-        newData.idStatusType = responseDefault?._id
+        const responseDefault = await this.statusService.findAll({ type: 'Default' });
+
+        const statusIds = responseDefault
+          .filter((item: any) => item?.name === 'Pendiente' || item?.name === 'En proceso') // Filtra los dos estados
+          .map((item: any) => new mongoose.Types.ObjectId(item?._id)); // Mapea solo los _id
+      
+        if (statusIds.length > 0) {
+          newData.idStatusType = { $in: statusIds }; // Usa $in para buscar por varios valores
+        }
       }
 
       if(page && limit) skip = page * limit
@@ -246,8 +253,7 @@ export class TakController {
       const updatedTak = await this.service.updateTak(id, data);
       if (!updatedTak) throw new NotFoundException('Item not found!');
 
-
-      this.gateway.emitEvent('takUpdated', fullTak);
+      this.gateway.emitEvent('takUpdate', await this.listAsyncTak({}));
       return fullTak;
 
     } catch (error) {

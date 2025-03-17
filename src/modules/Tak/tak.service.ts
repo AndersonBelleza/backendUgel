@@ -13,6 +13,7 @@ export class TakService {
   }
 
   async listAsync(body: any, skip: number = 0, limit: any = null) {
+    const statusEnProcesoId = new mongoose.Types.ObjectId("6794048db1b6e0a91e3f4e85");
     const totalRecordsQuery = this.TakModel.countDocuments(body);
     const paginatedResultsQuery = this.TakModel.find(body)
     .populate([
@@ -26,17 +27,7 @@ export class TakService {
           },
           {
             path: 'idPerson',
-            select: 'name paternalSurname maternalSurname',
-          },
-        ],
-      },
-      {
-        path: 'idTechnical',
-        select: 'username idArea idPerson',
-        populate: [
-          {
-            path: 'idPerson',
-            select: 'name paternalSurname maternalSurname',
+            select: 'firstName lastName',
           },
         ],
       },
@@ -55,34 +46,28 @@ export class TakService {
     ])
     .skip(skip)
     .limit(limit)
-    .sort({ createdAt: -1 })      
     .lean()
     .exec();
-
     const [totalRecords, paginatedResults] = await Promise.all([
       totalRecordsQuery,
       paginatedResultsQuery
     ]);
-    
-    // Ordenar primero por 'En Proceso'
-    const sortedResults = paginatedResults.sort((a : any, b : any) => {
-      const statusA = a?.idStatusType?.name === 'En Proceso' ? 0 : 1;
-      const statusB = b?.idStatusType?.name === 'En Proceso' ? 0 : 1;
-      
+    // Ordenar en código los resultados para "En proceso" primero
+    const sortedResults = paginatedResults.sort((a: any, b: any) => {
+      const statusA = String(a?.idStatusType?._id) === String(statusEnProcesoId) ? 0 : 1;
+      const statusB = String(b?.idStatusType?._id) === String(statusEnProcesoId) ? 0 : 1;
       if (statusA !== statusB) {
-        return statusA - statusB; // Si uno es 'En Proceso', va primero
+        return statusA - statusB; // "En proceso" va primero
       }
-    
       // Si ambos son iguales, ordenar por fecha de creación (descendente)
       return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
     });
-    
     return {
       total: totalRecords,
       results: sortedResults
     };
-    
   }
+
 
   async countTak ( body : any = { }) {
     const totalRecordsQuery = this.TakModel.countDocuments(body);

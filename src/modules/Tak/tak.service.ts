@@ -66,8 +66,8 @@ export class TakService {
     
     // Ordenar primero por 'En Proceso'
     const sortedResults = paginatedResults.sort((a : any, b : any) => {
-      const statusA = a?.idStatusType?.name === 'En Proceso' ? 0 : 1;
-      const statusB = b?.idStatusType?.name === 'En Proceso' ? 0 : 1;
+      const statusA = a?.idStatusType?.name === 'En proceso' ? 0 : 1;
+      const statusB = b?.idStatusType?.name === 'En proceso' ? 0 : 1;
       
       if (statusA !== statusB) {
         return statusA - statusB; // Si uno es 'En Proceso', va primero

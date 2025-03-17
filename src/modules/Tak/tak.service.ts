@@ -26,7 +26,17 @@ export class TakService {
           },
           {
             path: 'idPerson',
-            select: 'firstName lastName',
+            select: 'name paternalSurname maternalSurname',
+          },
+        ],
+      },
+      {
+        path: 'idTechnical',
+        select: 'username idArea idPerson',
+        populate: [
+          {
+            path: 'idPerson',
+            select: 'name paternalSurname maternalSurname',
           },
         ],
       },

@@ -34,6 +34,9 @@ export class Tak {
   @Prop({ type: Types.ObjectId, ref: 'User' })
   idUser: Types.ObjectId;
 
+  @Prop({ type: Types.ObjectId, ref: 'User' })
+  idTechnical?: Types.ObjectId;
+
   @Prop({ type: Types.ObjectId, ref: 'StatusType' })
   idStatusType: Types.ObjectId;
 

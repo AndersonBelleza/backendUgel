@@ -12,6 +12,10 @@ export class AreaService {
     return await this.AreaModel.find();
   }
 
+  async findOne( data : any = {} ){
+    return await this.AreaModel.findOne( data );
+  }
+
   async listAsync ( data : any = {} ){
     return await this.AreaModel.find( data );
   }

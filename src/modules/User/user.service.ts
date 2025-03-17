@@ -8,8 +8,17 @@ import { InjectModel } from '@nestjs/mongoose';
 export class UserService {
   constructor(@InjectModel(User.name) private model: Model<User>) { }
 
-  async list() {
-    return await this.model.find();
+  async list( data : any = {}) {
+    return await this.model.find(data)    
+    .populate([
+      {
+        path: 'idPerson',
+        select: 'name paternalSurname maternalSurname',
+      }
+    ])
+    .sort({ createdAt: 'desc' })
+    .lean()
+    .exec();
   }
 
   async listAsync(body: any, skip: number = 0, limit: any = null) {
@@ -22,7 +31,7 @@ export class UserService {
         },
         {
           path: 'idPerson',
-          select: 'firstName lastName'
+          select: 'name paternalSurname maternalSurname',
         },
         {
           path: 'idArea',
@@ -49,7 +58,7 @@ export class UserService {
     .populate([
       {
         path: 'idPerson',
-        select: 'firstName lastName',
+        select: 'name paternalSurname maternalSurname',
       },
       {
         path: 'idArea',

@@ -13,5 +13,7 @@ import { Area, AreaSchema } from './area.schema';
   ])],
   controllers: [ AreaController ],
   providers: [ AreaService ],
+  exports: [ AreaService ]
+  
 })
 export class AreaModule {}

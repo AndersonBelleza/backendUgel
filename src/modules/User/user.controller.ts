@@ -5,11 +5,13 @@ import * as bcrypt from 'bcryptjs'
 import { StatusTypeService } from '../statusType/statusType.service';
 import mongoose, { Types } from 'mongoose';
 import { PersonService } from '../Person/person.service';
+import { AreaService } from '../Area/area.service';
 
 @Controller('user')
 export class UserController {
   constructor(
     private service: UserService,
+    private areaService: AreaService,
     private statusTypeService: StatusTypeService,
     private personService : PersonService
   ){}
@@ -17,7 +19,6 @@ export class UserController {
   @Get()
   buscar(@Req() req: Request){
     return this.service.list();
-    
   }
 
   @Post()
@@ -34,42 +35,77 @@ export class UserController {
     }
   }
 
-  @Post('createUserAndPerson')
-  async createUserAndPerson(@Body() body: UserInterface, @Req() req: Request){
+  @Post('listUserByRole')
+  async listUserByRole(@Body() body: any, @Req() req: Request) {
     try {
-      const dataPerson : any = body;
-      
-      // ! Encriptamos la contraseña
-      const passwordEncrypted = await bcrypt.hash( body.password, 15 );
+      const responseArea = await this.areaService.findOne({ name: body.nameArea });
+      if( responseArea ) {
+        const response = await this.service.list({ idArea: responseArea?._id });
+
+        return response;
+      }
+
+      return [];
+
+    } catch (error) {
+      if (error.code === 11000) {
+        throw new ConflictException('El elemento ya existe.');
+      }
+      throw error;
+    }
+  }  
+
+  @Post('createUserAndPerson')
+  async createUserAndPerson(@Body() body: UserInterface, @Req() req: Request) {
+    try {
+      const dataPerson: any = body;
+  
+      const existingUser = await this.service.findOne({ username: body.username });
+      if (existingUser) {
+        return { message: 'El nombre de usuario ya está en uso.' };
+      }
+  
+      // 🔒 Encriptamos la contraseña
+      const passwordEncrypted = await bcrypt.hash(body.password, 15);
       body.password = passwordEncrypted;
-
-      const responseStatusType = await this.statusTypeService.findOne( { name: 'Activo', type: 'User' } ); // Aqui irá el estado ACTIVO (Default)
-      if (responseStatusType) body.idStatusType = new Types.ObjectId( responseStatusType?._id.toString() );
-
-      //! lÓGICA PARA REGISTRAR PERSONA O VALIDAR SI EXISTE.
-      if( dataPerson.firstName && dataPerson.lastName ) {
-        let responsePerson : any = {};
-        responsePerson = await this.personService.findOne({
-          firstName: { $regex: new RegExp(`^${dataPerson?.firstName}$`, 'i') },
-          lastName: { $regex: new RegExp(`^${dataPerson?.lastName}$`, 'i') },
-        });      
-
-        if( !responsePerson ) {
+  
+      // 🚦 Estado por defecto (ACTIVO)
+      const responseStatusType = await this.statusTypeService.findOne({ 
+        name: 'Activo', 
+        type: 'User' 
+      });
+      if (responseStatusType) {
+        body.idStatusType = new Types.ObjectId(responseStatusType?._id.toString());
+      }
+  
+      if (dataPerson.name && dataPerson.paternalSurname && dataPerson.maternalSurname) {
+        let responsePerson = await this.personService.findOne({
+          name: { $regex: new RegExp(`^${dataPerson?.name}$`, 'i') },
+          paternalSurname: { $regex: new RegExp(`^${dataPerson?.paternalSurname}$`, 'i') },
+          maternalSurname: { $regex: new RegExp(`^${dataPerson?.maternalSurname}$`, 'i') },
+        });
+  
+        if (!responsePerson) {
+          // Si no existe, la registramos
           responsePerson = await this.personService.createPerson({
-            firstName: dataPerson?.firstName,
-            lastName: dataPerson?.lastName
-          })
+            name: dataPerson?.name,
+            paternalSurname: dataPerson?.paternalSurname,
+            maternalSurname: dataPerson?.maternalSurname
+          });
+        } else {
+          // Si la persona ya tiene usuario, devolvemos un mensaje
+          const existingPersonWithUser = await this.service.findOne({ idPerson: responsePerson._id });
+          if (existingPersonWithUser) {
+            return { message: 'La persona ya cuenta con un usuario registrado.' };
+          }
         }
-
-        //! Verificamos si la persona ya tiene una cuenta con USUARIO
-        const responseExistsWithUser = await this.service.findOne({ idPerson : responsePerson?._id });
-        if( responseExistsWithUser ) return { message : 'La persona ya cuenta con un usuario disponible.'};
-
-        body.idPerson = responsePerson?._id
+  
+        body.idPerson = responsePerson._id;
       }   
-
+  
+      // 🚀 Creamos el usuario si pasa todas las validaciones
       const dataUser = {
-        username : body.username,
+        username: body.username,
         password: body.password,
         role: body.role,
         dateCreate: new Date().toISOString(),
@@ -77,17 +113,17 @@ export class UserController {
         idPerson: body.idPerson,
         idStatusType: body.idStatusType,
       };
-
+  
       const response = await this.service.createUser(dataUser);
       return response;
-
+  
     } catch (error) {
-      if(error.code === 11000){
-        throw new ConflictException('The element already exists');
+      if (error.code === 11000) {
+        throw new ConflictException('El elemento ya existe.');
       }
       throw error;
     }
-  }
+  }  
 
   @Post('listAsyncUser')
   async listAsyncUser(@Body() body: any, @Req() req: Request){
@@ -136,7 +172,7 @@ export class UserController {
       const responsePerson = await this.personService.findOne({ _id : body?.idPerson });
       
       //! lÓGICA PARA ACTUALIZAR A UNA PERSONA ( Solo pasará a actualizarse cuando haya un cambio en el nombre de la persona. )
-      if( dataPerson.firstName != responsePerson?.firstName || dataPerson.lastName != responsePerson?.lastName ) {
+      if( dataPerson.name != responsePerson?.name || dataPerson.paternalSurname != responsePerson?.paternalSurname || dataPerson.maternalSurname != responsePerson?.maternalSurname ) {
         await this.personService.updatePerson(body?.idPerson, dataPerson);
       } 
       

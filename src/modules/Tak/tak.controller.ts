@@ -74,7 +74,7 @@ export class TakController {
       }
 
       const responseStatusType = await this.statusService.findOne({ type: 'Default', name : 'Pendiente' });
-      if( responseStatusType ) data.idStatusType = responseStatusType?._id;
+      if( responseStatusType ) data.idStatusType = new mongoose.Types.ObjectId(responseStatusType?._id);
         
       const { idUser, idStatusPriority } = data;
 
@@ -244,17 +244,41 @@ export class TakController {
         data.evidence = [ ...fullTak.evidence, ...evidence ];
       } 
       
-      const { idStatusPriority, idStatusType,  idTimePeriod } = data; // TODO: Estos datos aparecen de "data"
+      const { idStatusPriority, idStatusType,  idTimePeriod, idTechnical } = data; // TODO: Estos datos aparecen de "data"
       if( idStatusPriority ) data.idStatusPriority = new mongoose.Types.ObjectId(idStatusPriority);
       if( idStatusType ) data.idStatusType = new mongoose.Types.ObjectId(idStatusType);
       if( idTimePeriod ) data.idTimePeriod = new mongoose.Types.ObjectId(idTimePeriod);
-
+      if( idTechnical ) data.idTechnical = new mongoose.Types.ObjectId(idTechnical);
+      
       // * SE DEBE VALIDAR QUE TODOS LOS ID, SE GUARDEN COMO "OBJECTID"
       const updatedTak = await this.service.updateTak(id, data);
       if (!updatedTak) throw new NotFoundException('Item not found!');
 
       this.gateway.emitEvent('takUpdate', await this.listAsyncTak({}));
       return fullTak;
+
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  @Put('updateAssingTechnical/:id')
+  async updateAssingTechnical(@Param('id')  id : string, @Body() body: any, @Req() req: Request) {
+    try { 
+      const { idTechnical } = body;
+
+      let data : any = {};
+
+      // * SE DEBE VALIDAR QUE TODOS LOS ID, SE GUARDEN COMO "OBJECTID"
+      if( idTechnical ) data.idTechnical = new mongoose.Types.ObjectId(idTechnical);
+      const responseStatusType = await this.statusService.findOne({ type: 'Default', name : 'En proceso' });
+      if( responseStatusType ) data.idStatusType = new mongoose.Types.ObjectId(responseStatusType?._id);
+
+      const updatedTak = await this.service.updateTak(id, data);
+      if (!updatedTak) throw new NotFoundException('Item not found!');
+
+      this.gateway.emitEvent('takUpdate', await this.listAsyncTak({}));
+      return updatedTak;
 
     } catch (error) {
       throw error;

@@ -7,6 +7,7 @@ import { StatusTypeModule } from '../statusType/statusType.module';
 import { JwtModule } from '@nestjs/jwt';
 import { TOKEN_SECRET } from 'src/config';
 import { PersonModule } from '../Person/person.module';
+import { AreaModule } from '../Area/area.module';
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { PersonModule } from '../Person/person.module';
     ]),
     StatusTypeModule,
     PersonModule,
+    AreaModule,
     JwtModule.register({
       global: true,
       secret: TOKEN_SECRET,

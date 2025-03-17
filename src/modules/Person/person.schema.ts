@@ -11,10 +11,13 @@ export class Person {
   bool: string;
 
   @Prop({ required: true })
-  firstName: string;
+  name: string;
   
   @Prop({ required: true })
-  lastName: string;
+  paternalSurname: string;
+
+  @Prop({ required: true })
+  maternalSurname: string;
 
   @Prop({ required: false })
   typeDocument: string;

@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { Tak } from './tak.schema';
 
-import { Model } from 'mongoose';
+import mongoose, { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 
 @Injectable()

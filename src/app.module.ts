@@ -13,7 +13,7 @@ import { ImagesController, MakeImagesController, FilesController, FileController
 
 @Module({
   imports: [
-    MongooseModule.forRoot("mongodb+srv://bellezatorresanderson:2yRteAB38FimVOGX@cluster0.mo2lj.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"),
+    MongooseModule.forRoot("mongodb://localhost:27017/system_ugel"),
     ApiConsumerModule,
     AuthModule,
     ConfigModule,

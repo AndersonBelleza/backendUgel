@@ -17,6 +17,12 @@ export class User {
 
   @Prop({ type: Types.ObjectId, ref: 'Area' })
   idArea: Types.ObjectId;
+  
+  @Prop({ type: Types.ObjectId, ref: 'Teamwork' })
+  idTeamwork: Types.ObjectId;
+
+  @Prop({ type: Types.ObjectId, ref: 'Subteamwork' })
+  idSubteamwork: Types.ObjectId;
 
   @Prop({ required: true, unique: true })
   username: string;

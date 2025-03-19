@@ -10,16 +10,20 @@ import { AuthModule } from './modules/auth/auth-user.module';
 import { DoorControlModule } from './modules/DoorControl/doorControl.module';
 
 import { ImagesController, MakeImagesController, FilesController, FileController } from './modules/images/images.controller'
+import { TeamworkModule } from './modules/Teamwork/teamwork.module';
+import { SubteamworkModule } from './modules/Subteamwork/subteamwork.module';
 
 @Module({
   imports: [
-    MongooseModule.forRoot("mongodb://localhost:27017/system_ugel"),
+    MongooseModule.forRoot("mongodb+srv://bellezatorresanderson:2yRteAB38FimVOGX@cluster0.mo2lj.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"),
     ApiConsumerModule,
     AuthModule,
     ConfigModule,
     TakModule,
     UserModule,
     AreaModule,
+    TeamworkModule,
+    SubteamworkModule,
     PersonModule,
     DoorControlModule
   ],

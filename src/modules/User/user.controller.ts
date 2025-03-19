@@ -6,12 +6,14 @@ import { StatusTypeService } from '../statusType/statusType.service';
 import mongoose, { Types } from 'mongoose';
 import { PersonService } from '../Person/person.service';
 import { AreaService } from '../Area/area.service';
+import { SubteamworkService } from '../Subteamwork/subteamwork.service';
 
 @Controller('user')
 export class UserController {
   constructor(
     private service: UserService,
     private areaService: AreaService,
+    private subteamworkService : SubteamworkService,
     private statusTypeService: StatusTypeService,
     private personService : PersonService
   ){}
@@ -24,7 +26,6 @@ export class UserController {
   @Post()
   async crear(@Body() body: UserInterface, @Req() req: Request){
     try {
-
       const response = await this.service.createUser(body);
       return response
     } catch (error) {
@@ -35,13 +36,15 @@ export class UserController {
     }
   }
 
-  @Post('listUserByRole')
-  async listUserByRole(@Body() body: any, @Req() req: Request) {
+  @Get('listTechnical')
+  async listTechnical(@Req() req: Request) {
     try {
-      const responseArea = await this.areaService.findOne({ name: body.nameArea });
-      if( responseArea ) {
-        const response = await this.service.list({ idArea: responseArea?._id });
-
+      
+      const responseSubteamwork = await this.subteamworkService.findOne({ name: 'TECNOLOGÍA DE LA INFORMACIÓN' });
+      
+      if( responseSubteamwork ) {
+        const responseStatus = await this.statusTypeService.findOne({ name: 'Activo', type: 'User' });
+        const response = await this.service.list({ idSubteamwork: responseSubteamwork?._id, idStatusType: new mongoose.Types.ObjectId(responseStatus?._id) });
         return response;
       }
 
@@ -74,9 +77,8 @@ export class UserController {
         name: 'Activo', 
         type: 'User' 
       });
-      if (responseStatusType) {
-        body.idStatusType = new Types.ObjectId(responseStatusType?._id.toString());
-      }
+      
+      if (responseStatusType) body.idStatusType = new mongoose.Types.ObjectId(responseStatusType?._id)
   
       if (dataPerson.name && dataPerson.paternalSurname && dataPerson.maternalSurname) {
         let responsePerson = await this.personService.findOne({
@@ -109,9 +111,11 @@ export class UserController {
         password: body.password,
         role: body.role,
         dateCreate: new Date().toISOString(),
-        idArea: new mongoose.Types.ObjectId(body.idArea?.toString()),
-        idPerson: body.idPerson,
-        idStatusType: body.idStatusType,
+        idArea: new mongoose.Types.ObjectId(body.idArea),
+        idPerson: new mongoose.Types.ObjectId(body.idPerson),
+        idStatusType: new mongoose.Types.ObjectId(body.idStatusType),
+        idTeamwork: new mongoose.Types.ObjectId(body.idTeamwork),
+        idSubteamwork: new mongoose.Types.ObjectId(body.idSubteamwork),
       };
   
       const response = await this.service.createUser(dataUser);
@@ -147,7 +151,8 @@ export class UserController {
     let nameSearch = 'Activo';
     nameStatus == 'Activo' ? nameSearch = 'Inactivo' : 'Activo';
     const responseStatusType = await this.statusTypeService.findOne({ name : nameSearch, type: 'User' });
-    const res = await this.service.updateUser(id, { idStatusType : new mongoose.Types.ObjectId(responseStatusType?._id.toString())});
+    const res = await this.service.updateUser(id, { idStatusType : new mongoose.Types.ObjectId(responseStatusType?._id) });
+
     if(!res) throw new NotFoundException('Item not found!');
     return res;
   }
@@ -180,8 +185,10 @@ export class UserController {
         username : body.username,
         role: body.role,
         dateCreate: new Date().toISOString(),
-        idArea: new mongoose.Types.ObjectId(body.idArea?.toString()),
-        idPerson: body.idPerson
+        idPerson: new mongoose.Types.ObjectId(body.idPerson),
+        idArea: new mongoose.Types.ObjectId(body.idArea),
+        idTeamwork: new mongoose.Types.ObjectId(body.idTeamwork),
+        idSubteamwork: new mongoose.Types.ObjectId(body.idSubteamwork),
       };
 
       const response = await this.service.updateUser(idProcess, dataUser);

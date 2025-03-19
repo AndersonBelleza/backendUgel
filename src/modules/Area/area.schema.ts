@@ -17,11 +17,8 @@ export class Area {
   bool: string;
 
   @Prop({ type: String })
-  description: string;
+  acronym: string;
   
-  @Prop({ type: Number })
-  floorNumber: number;
-
 }
 
 export const AreaSchema = SchemaFactory.createForClass(Area);

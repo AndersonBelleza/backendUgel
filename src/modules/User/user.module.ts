@@ -8,6 +8,7 @@ import { JwtModule } from '@nestjs/jwt';
 import { TOKEN_SECRET } from 'src/config';
 import { PersonModule } from '../Person/person.module';
 import { AreaModule } from '../Area/area.module';
+import { SubteamworkModule } from '../Subteamwork/subteamwork.module';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { AreaModule } from '../Area/area.module';
     StatusTypeModule,
     PersonModule,
     AreaModule,
+    SubteamworkModule,
     JwtModule.register({
       global: true,
       secret: TOKEN_SECRET,

@@ -10,8 +10,11 @@ export class Subteamwork {
   @Prop({ default: '0', type: String })
   bool: string;
 
-  @Prop({ required: true, unique: true })
+  @Prop({ required: true })
   name: string;
+
+  @Prop({ required: true })
+  floorNumber: string;
   
   @Prop({ type: Types.ObjectId, ref: 'Teamwork' })
   idTeamwork: Types.ObjectId;

@@ -23,7 +23,6 @@ export class TeamworkController {
       const responseStatusType = await this.statusTypeService.findOne({ type: 'Default', name: 'Activo' });
       if (!responseStatusType) return { message: 'Status type "Activo" not found' };
       
-
       body.idStatusType = new mongoose.Types.ObjectId(responseStatusType._id);
   
       if (idArea) body.idArea = new mongoose.Types.ObjectId( idArea );
@@ -70,7 +69,13 @@ export class TeamworkController {
   }
 
   @Put(':id')
-  async actualizarTeamwork(@Param('id')  id : string, @Body() body: any, @Req() req: Request){
+  async updateTeamwork(@Param('id')  id : string, @Body() body: any, @Req() req: Request){
+    
+    const { idStatusType, idArea } = body;
+    
+    if ( idArea ) body.idArea = new mongoose.Types.ObjectId(idArea);
+    if ( idStatusType ) body.idStatusType = new mongoose.Types.ObjectId(idStatusType);
+
     const res = await this.service.updateTeamwork(id, body);
     if(!res) throw new NotFoundException('Item not found!');
     return res;

@@ -6,12 +6,14 @@ import { StatusTypeService } from '../statusType/statusType.service';
 import mongoose, { Types } from 'mongoose';
 import { PersonService } from '../Person/person.service';
 import { AreaService } from '../Area/area.service';
+import { SubteamworkService } from '../Subteamwork/subteamwork.service';
 
 @Controller('user')
 export class UserController {
   constructor(
     private service: UserService,
     private areaService: AreaService,
+    private subteamworkService : SubteamworkService,
     private statusTypeService: StatusTypeService,
     private personService : PersonService
   ){}
@@ -34,13 +36,15 @@ export class UserController {
     }
   }
 
-  @Post('listUserByRole')
-  async listUserByRole(@Body() body: any, @Req() req: Request) {
+  @Get('listTechnical')
+  async listTechnical(@Req() req: Request) {
     try {
-      const responseArea = await this.areaService.findOne({ name: body.nameArea });
-      if( responseArea ) {
-        const response = await this.service.list({ idArea: responseArea?._id });
-
+      
+      const responseSubteamwork = await this.subteamworkService.findOne({ name: 'TECNOLOGÍA DE LA INFORMACIÓN' });
+      
+      if( responseSubteamwork ) {
+        const responseStatus = await this.statusTypeService.findOne({ name: 'Activo', type: 'User' });
+        const response = await this.service.list({ idSubteamwork: responseSubteamwork?._id, idStatusType: new mongoose.Types.ObjectId(responseStatus?._id) });
         return response;
       }
 
@@ -147,7 +151,8 @@ export class UserController {
     let nameSearch = 'Activo';
     nameStatus == 'Activo' ? nameSearch = 'Inactivo' : 'Activo';
     const responseStatusType = await this.statusTypeService.findOne({ name : nameSearch, type: 'User' });
-    const res = await this.service.updateUser(id, { idStatusType : new mongoose.Types.ObjectId(responseStatusType?._id.toString())});
+    const res = await this.service.updateUser(id, { idStatusType : new mongoose.Types.ObjectId(responseStatusType?._id) });
+
     if(!res) throw new NotFoundException('Item not found!');
     return res;
   }

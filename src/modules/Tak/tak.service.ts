@@ -25,6 +25,10 @@ export class TakService {
             select: 'name acronym',
           },
           {
+            path: 'idSubteamwork',
+            select: 'name floorNumber',
+          },
+          {
             path: 'idPerson',
             select: 'name paternalSurname maternalSurname',
           },

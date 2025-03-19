@@ -1,6 +1,7 @@
 import { Controller, Get, Post, Body, Param, Delete, HttpCode, NotFoundException, Req, Put, ConflictException } from '@nestjs/common';
 import { AreaService } from './area.service';
 import { StatusTypeService } from '../statusType/statusType.service';
+import mongoose from 'mongoose';
 
 @Controller('area')
 export class AreaController {
@@ -58,6 +59,11 @@ export class AreaController {
 
   @Put(':id')
   async actualizarArea(@Param('id')  id : string, @Body() body: any, @Req() req: Request){
+    
+    const { idStatusType } = body;
+
+    body.idStatusType = new mongoose.Types.ObjectId(idStatusType);
+
     const res = await this.service.updateArea(id, body);
     if(!res) throw new NotFoundException('Item not found!');
     return res;

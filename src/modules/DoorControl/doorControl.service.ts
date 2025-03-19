@@ -27,7 +27,7 @@ export class DoorControlService {
         },
         {
           path: 'idArea',
-          select: 'name floorNumber'
+          select: 'name '
         },
       ])
       .skip(skip)

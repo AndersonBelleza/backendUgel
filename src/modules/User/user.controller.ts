@@ -24,7 +24,6 @@ export class UserController {
   @Post()
   async crear(@Body() body: UserInterface, @Req() req: Request){
     try {
-
       const response = await this.service.createUser(body);
       return response
     } catch (error) {
@@ -74,9 +73,8 @@ export class UserController {
         name: 'Activo', 
         type: 'User' 
       });
-      if (responseStatusType) {
-        body.idStatusType = new Types.ObjectId(responseStatusType?._id.toString());
-      }
+      
+      if (responseStatusType) body.idStatusType = new mongoose.Types.ObjectId(responseStatusType?._id)
   
       if (dataPerson.name && dataPerson.paternalSurname && dataPerson.maternalSurname) {
         let responsePerson = await this.personService.findOne({
@@ -109,9 +107,11 @@ export class UserController {
         password: body.password,
         role: body.role,
         dateCreate: new Date().toISOString(),
-        idArea: new mongoose.Types.ObjectId(body.idArea?.toString()),
-        idPerson: body.idPerson,
-        idStatusType: body.idStatusType,
+        idArea: new mongoose.Types.ObjectId(body.idArea),
+        idPerson: new mongoose.Types.ObjectId(body.idPerson),
+        idStatusType: new mongoose.Types.ObjectId(body.idStatusType),
+        idTeamwork: new mongoose.Types.ObjectId(body.idTeamwork),
+        idSubteamwork: new mongoose.Types.ObjectId(body.idSubteamwork),
       };
   
       const response = await this.service.createUser(dataUser);
@@ -180,8 +180,10 @@ export class UserController {
         username : body.username,
         role: body.role,
         dateCreate: new Date().toISOString(),
-        idArea: new mongoose.Types.ObjectId(body.idArea?.toString()),
-        idPerson: body.idPerson
+        idPerson: new mongoose.Types.ObjectId(body.idPerson),
+        idArea: new mongoose.Types.ObjectId(body.idArea),
+        idTeamwork: new mongoose.Types.ObjectId(body.idTeamwork),
+        idSubteamwork: new mongoose.Types.ObjectId(body.idSubteamwork),
       };
 
       const response = await this.service.updateUser(idProcess, dataUser);

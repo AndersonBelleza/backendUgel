@@ -22,7 +22,7 @@ export class TakService {
         populate: [
           {
             path: 'idArea',
-            select: 'name floorNumber',
+            select: 'name acronym',
           },
           {
             path: 'idPerson',
@@ -112,14 +112,14 @@ export class TakService {
             path: 'idUser', // Relación principal
             populate: {
               path: 'idArea', // Relación dentro de idUser
-              select: 'name floorNumber', // Solo incluye estos campos
+              select: 'name acronym', // Solo incluye estos campos
             },
           },
           {
             path: 'idUser', // Relación principal
             populate: {
               path: 'idArea', // Relación dentro de idUser
-              select: 'name floorNumber', // Solo incluye estos campos
+              select: 'name acronym', // Solo incluye estos campos
             },
           }
         ])
@@ -137,7 +137,7 @@ export class TakService {
           populate: [
             {
               path: 'idArea',
-              select: 'name floorNumber',
+              select: 'name ',
             },
           ],
         },

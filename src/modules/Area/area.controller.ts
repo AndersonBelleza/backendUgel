@@ -1,10 +1,12 @@
 import { Controller, Get, Post, Body, Param, Delete, HttpCode, NotFoundException, Req, Put, ConflictException } from '@nestjs/common';
 import { AreaService } from './area.service';
+import { StatusTypeService } from '../statusType/statusType.service';
 
 @Controller('area')
 export class AreaController {
   constructor(
     private service: AreaService, 
+    private statusTypeService : StatusTypeService
   ){}
 
   @Get()
@@ -16,7 +18,12 @@ export class AreaController {
   @Post()
   async crear(@Body() body: any, @Req() req: Request){
     try {
+
+      const responseStatusType = await this.statusTypeService.findOne({ type: 'Default', name: 'Activo' });
+      if ( responseStatusType ) body.idStatusType = responseStatusType?._id;
+      
       const response = await this.service.createArea(body);
+
       return response
     } catch (error) {
       if(error.code === 11000){

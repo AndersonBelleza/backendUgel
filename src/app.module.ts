@@ -10,6 +10,8 @@ import { AuthModule } from './modules/auth/auth-user.module';
 import { DoorControlModule } from './modules/DoorControl/doorControl.module';
 
 import { ImagesController, MakeImagesController, FilesController, FileController } from './modules/images/images.controller'
+import { TeamworkModule } from './modules/Teamwork/teamwork.module';
+import { SubteamworkModule } from './modules/Subteamwork/subteamwork.module';
 
 @Module({
   imports: [
@@ -20,6 +22,8 @@ import { ImagesController, MakeImagesController, FilesController, FileController
     TakModule,
     UserModule,
     AreaModule,
+    TeamworkModule,
+    SubteamworkModule,
     PersonModule,
     DoorControlModule
   ],

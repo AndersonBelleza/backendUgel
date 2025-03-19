@@ -35,7 +35,15 @@ export class UserService {
         },
         {
           path: 'idArea',
-          select: 'name floorNumber'
+          select: 'name acronym'
+        },
+        {
+          path: 'idTeamwork',
+          select: 'name'
+        },
+        {
+          path: 'idSubteamwork',
+          select: 'name acronym'
         },
       ])
       .skip(skip)
@@ -62,7 +70,7 @@ export class UserService {
       },
       {
         path: 'idArea',
-        select: 'name floorNumber',
+        select: 'name acronym',
       }
     ]);
   }

@@ -35,7 +35,7 @@ export class AuthController {
 
     const token = await this.jwtService.signAsync({ id: userFound._id, role: userFound?.role });
     const statusType = await this.statusTypeService.findOne({ name: 'Activo', type: 'User' });
-
+    if( !statusType )  return res.status(400).json({ message: 'No está asignado un estado.' });
     if( userFound?.idStatusType?.toString() !== statusType._id.toString() ) return res.status(400).json({ message: 'Usuario inactivo.' });
     
     res.json({

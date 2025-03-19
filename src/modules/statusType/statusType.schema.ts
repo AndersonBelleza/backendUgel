@@ -16,7 +16,7 @@ export class StatusType {
   @Prop({ required: false })
   type: string;
 
-  @Prop({ required: true, unique: true })
+  @Prop({ required: true })
   name: string;
 
   @Prop({ type: String })
@@ -25,3 +25,4 @@ export class StatusType {
 }
 
 export const StatusTypeSchema = SchemaFactory.createForClass(StatusType);
+StatusTypeSchema.index({ name: 1, type: 1 }, { unique: true });

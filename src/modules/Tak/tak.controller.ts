@@ -73,7 +73,7 @@ export class TakController {
         }
       }
 
-      const responseStatusType = await this.statusService.findOne({ type: 'Default', name : 'Pendiente' });
+      const responseStatusType = await this.statusService.findOne({ type: 'Tak', name : 'Pendiente' });
       if( responseStatusType ) data.idStatusType = new mongoose.Types.ObjectId(responseStatusType?._id);
         
       const { idUser, idStatusPriority } = data;
@@ -136,7 +136,7 @@ export class TakController {
       if( idStatusType ) {
         newData.idStatusType = new mongoose.Types.ObjectId(idStatusType);
       }else {
-        const responseDefault = await this.statusService.findAll({ type: 'Default' });
+        const responseDefault = await this.statusService.findAll({ type: 'Tak' });
 
         const statusIds = responseDefault
           .filter((item: any) => item?.name === 'Pendiente' || item?.name === 'En proceso') // Filtra los dos estados
@@ -271,7 +271,7 @@ export class TakController {
 
       // * SE DEBE VALIDAR QUE TODOS LOS ID, SE GUARDEN COMO "OBJECTID"
       if( idTechnical ) data.idTechnical = new mongoose.Types.ObjectId(idTechnical);
-      const responseStatusType = await this.statusService.findOne({ type: 'Default', name : 'En proceso' });
+      const responseStatusType = await this.statusService.findOne({ type: 'Tak', name : 'En proceso' });
       if( responseStatusType ) data.idStatusType = new mongoose.Types.ObjectId(responseStatusType?._id);
 
       const updatedTak = await this.service.updateTak(id, data);

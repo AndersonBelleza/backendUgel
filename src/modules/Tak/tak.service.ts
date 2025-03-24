@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { Tak } from './tak.schema';
 
-import { Model } from 'mongoose';
+import mongoose, { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 
 @Injectable()
@@ -10,6 +10,52 @@ export class TakService {
 
   async list(){
     return await this.TakModel.find();
+  }
+
+  async getResume(idUser: string) {
+    const resumen = await this.TakModel.aggregate([
+      {
+        $match: { idUser: new mongoose.Types.ObjectId(idUser) } // Convertir idUser a ObjectId
+      },
+      {
+        $group: {
+          _id: "$idStatusType",
+          count: { $sum: 1 }
+        }
+      },
+      {
+        $lookup: {
+          from: "statustypes", // Nombre de la colección de estados
+          localField: "_id",
+          foreignField: "_id",
+          as: "status"
+        }
+      },
+      {
+        $unwind: "$status"
+      },
+      {
+        $project: {
+          _id: 0,
+          statusName: "$status.name",
+          count: 1
+        }
+      }
+    ]);
+    // Obtener todos los estados posibles de la colección StatusType
+    const allStatuses = await this.TakModel.db.collection("statustypes").find({ type: "Tak" }).toArray();
+    // Crear un objeto con todos los estados posibles, inicializados en 0
+  const resumenFinal = allStatuses.reduce((acc, status) => {
+    acc[status.name] = 0;
+    return acc;
+  }, { Total: 0 }); // Se agrega el Total
+
+  // Rellenar los valores reales y calcular el total
+  resumen.forEach(({ statusName, count }) => {
+    resumenFinal[statusName] = count;
+    resumenFinal.Total += count;
+  });
+    return resumenFinal;
   }
 
   async listAsync(body: any, skip: number = 0, limit: any = null) {

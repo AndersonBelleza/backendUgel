@@ -31,6 +31,9 @@ export class Tak {
   @Prop({ type: String })
   recommendation: string;
 
+  @Prop({ default: '0', type: Number })
+  qualification: number;
+  
   @Prop({ type: Types.ObjectId, ref: 'User' })
   idUser: Types.ObjectId;
 

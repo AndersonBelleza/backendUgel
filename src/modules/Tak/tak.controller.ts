@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Param, Delete, HttpCode, NotFoundException, Req, Put, ConflictException, UseInterceptors, UploadedFiles } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Delete, HttpCode, NotFoundException, Req, Put, ConflictException, UseInterceptors, UploadedFiles, BadRequestException } from '@nestjs/common';
 import { TakService } from './tak.service';
 import { WebSocketGateway } from './tak.gateway';
 import { StatusTypeService } from '../statusType/statusType.service';
@@ -22,7 +22,10 @@ export class TakController {
     return this.service.list();
     
   }
-
+  @Get('resume/:idUser')
+  async getResume(@Param('idUser') idUser: string) {
+    return this.service.getResume(idUser);
+  }
   @Post()
   @UseInterceptors(
     FileFieldsInterceptor([
@@ -280,6 +283,56 @@ export class TakController {
       this.gateway.emitEvent('takUpdate', await this.listAsyncTak({}));
       return updatedTak;
 
+    } catch (error) {
+      throw error;
+    }
+  }
+  @Put('cancelTak/:id')
+  async cancelTak(@Param('id')  id : string, @Body() body: any, @Req() req: Request) {
+    try { 
+      // const { idTechnical } = body;
+      let data : any = {};
+      // * SE DEBE VALIDAR QUE TODOS LOS ID, SE GUARDEN COMO "OBJECTID"
+      // if( idTechnical ) data.idTechnical = new mongoose.Types.ObjectId(idTechnical);
+      const responseStatusType = await this.statusService.findOne({ type: 'Tak', name : 'Cancelado' });
+      if( responseStatusType ) data.idStatusType = new mongoose.Types.ObjectId(responseStatusType?._id);
+      const updatedTak = await this.service.updateTak(id, data);
+      if (!updatedTak) throw new NotFoundException('Item not found!');
+      this.gateway.emitEvent('takUpdate', await this.listAsyncTak({}));
+      return updatedTak;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  @Put('qualify/:id')
+  async qualify(@Param('id')  id : string, @Body() body: any, @Req() req: Request) {
+    try { 
+      let data: any = {};
+      const { qualification } = body;
+
+      // Validación de calificación (debe ser un número entre 1 y 5)
+      if (typeof qualification !== 'number' || qualification < 1 || qualification > 5) {
+        throw new BadRequestException('La calificación debe estar entre 1 y 5');
+      }
+
+      // // Obtener el estado "Calificado"
+      // const responseStatusType = await this.statusService.findOne({ type: 'Tak', name: 'Calificado' });
+      // if (responseStatusType) {
+      //   data.idStatusType = new mongoose.Types.ObjectId(responseStatusType._id);
+      // }
+
+      // Agregar la calificación a los datos que se actualizarán
+      data.qualification = qualification;
+
+      // Actualizar el ítem con la calificación
+      const updatedTak = await this.service.updateTak(id, data);
+      if (!updatedTak) throw new NotFoundException('Ítem no encontrado');
+
+      // Emitir evento WebSocket para notificar la actualización
+      this.gateway.emitEvent('takUpdate', await this.listAsyncTak({}));
+
+      return { message: 'Calificación actualizada correctamente', updatedTak };
     } catch (error) {
       throw error;
     }

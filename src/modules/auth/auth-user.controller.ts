@@ -14,6 +14,7 @@ import { AllRoll, PublicAccess, StopBody } from 'src/middlewares/decorators/publ
 import { LoginUserInterface } from 'src/interfaces/loginUser.interface';
 import { UserService } from '../User/user.service';
 import { StatusTypeService } from '../statusType/statusType.service';
+import mongoose from 'mongoose';
 
 @Controller('auth')
 export class AuthController {
@@ -36,16 +37,45 @@ export class AuthController {
     const token = await this.jwtService.signAsync({ id: userFound._id, role: userFound?.role });
     const statusType = await this.statusTypeService.findOne({ name: 'Activo', type: 'User' });
     if( !statusType )  return res.status(400).json({ message: 'No está asignado un estado.' });
+
     if( userFound?.idStatusType?.toString() !== statusType._id.toString() ) return res.status(400).json({ message: 'Usuario inactivo.' });
     
+    // lÓGICA PARA VER QUE TIPO DE CARGO TIENE EN LA ENTIDAD
+    // DIRECTOR > JEFE > RESPONSABLE > AYUDANTE
+    // DIRECTOR > BONIFACIO > BALAVARCA > LARRY
+    const idUserLogin = userFound?._id?.toString();
+    let idResponsible;
+    let chargeOcupation = "";
+
+    // ! Primero verificamos si es DIRECTOR.
+    if (!chargeOcupation && userFound?.idArea?.name == 'DIRECCIÓN'){
+      idResponsible = userFound?.idArea?.idResponsible?.toString();
+      if (idUserLogin === idResponsible ) chargeOcupation = 'Director';
+    }
+
+    // ! Luego verificamos si es JEFE de un ÁREA (idArea)
+    idResponsible = userFound?.idArea?.idResponsible?.toString();
+    if (!chargeOcupation && idUserLogin === idResponsible ) chargeOcupation = 'Jefe'
+
+    // ! Luego verificamos si es RESPONSABLE de un EQUIPO DE TRABAJO (idTeamwork)
+    idResponsible = userFound?.idTeamwork?.idResponsible?.toString();
+    if (!chargeOcupation && idUserLogin === idResponsible ) chargeOcupation = 'Responsable'
+
+    // ! Luego verificamos si es un FUNCIONARIO (idSubteamwork)
+    if(!chargeOcupation) chargeOcupation = 'Funcionario'
+  
     res.json({
       token: token,
       id: userFound._id,
       username: userFound.username,
       role: userFound?.role,
       idPerson: userFound?.idPerson,
-      idArea: userFound?.idArea
+      idArea: userFound?.idArea,
+      idTeamwork: userFound?.idTeamwork,
+      idSubteamwork: userFound?.idSubteamwork,
+      chargeOcupation: chargeOcupation
     });
+
   }
 
   @Post('logoutUser')

@@ -58,6 +58,27 @@ export class UserController {
     }
   }  
 
+  @Post('listResponsible/')
+  async listResponsible(@Body() body: any, @Req() req: Request) {
+    try {
+      const { idArea, idTeamwork } = body;
+
+      if( idArea ) body.idArea = new mongoose.Types.ObjectId(idArea);
+      if( idTeamwork ) body.idTeamwork = new mongoose.Types.ObjectId(idTeamwork);
+
+      const responseStatus = await this.statusTypeService.findOne({ name: 'Activo', type: 'User' });
+      
+      const response = await this.service.list({ ...body, idStatusType: new mongoose.Types.ObjectId(responseStatus?._id) });
+      return response;
+      
+    } catch (error) {
+      if (error.code === 11000) {
+        throw new ConflictException('El elemento ya existe.');
+      }
+      throw error;
+    }
+  }  
+
   @Post('createUserAndPerson')
   async createUserAndPerson(@Body() body: UserInterface, @Req() req: Request) {
     try {
@@ -158,7 +179,12 @@ export class UserController {
   }
 
   @Put(':id')
-  async actualizarUser(@Param('id')  id : string, @Body() body: any, @Req() req: Request){
+  async updateUser(@Param('id')  id : string, @Body() body: any, @Req() req: Request){
+
+    const { idStatusType } = body;
+    
+    if( idStatusType ) body.idStatusType = new mongoose.Types.ObjectId(idStatusType);
+
     const res = await this.service.updateUser(id, body);
     if(!res) throw new NotFoundException('Item not found!');
     return res;

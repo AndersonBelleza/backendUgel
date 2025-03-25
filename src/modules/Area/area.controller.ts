@@ -58,11 +58,12 @@ export class AreaController {
   }
 
   @Put(':id')
-  async actualizarArea(@Param('id')  id : string, @Body() body: any, @Req() req: Request){
+  async UpdateArea(@Param('id')  id : string, @Body() body: any, @Req() req: Request){
     
-    const { idStatusType } = body;
+    const { idStatusType, idResponsible } = body;
 
-    body.idStatusType = new mongoose.Types.ObjectId(idStatusType);
+    if( idResponsible ) body.idResponsible = new mongoose.Types.ObjectId(idResponsible);
+    if( idStatusType ) body.idStatusType = new mongoose.Types.ObjectId(idStatusType);
 
     const res = await this.service.updateArea(id, body);
     if(!res) throw new NotFoundException('Item not found!');

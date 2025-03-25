@@ -36,7 +36,7 @@ export function convertDate( dateString:any ) {
 
 export function stripTime(date:any) {
     return new Date(date.getFullYear(), date.getMonth(), date.getDate());
-  }
+}
 
 export function generarID(){
     let codigo:string = randomUUID();
@@ -58,11 +58,10 @@ export function decimalToDMS(deg, isLat) {
 
     return `${degrees}° ${minutes}' ${seconds.toFixed(2)}" ${direction} `;
 }
-
   
 export function generateCodeIssue(){
     const date = new Date().toLocaleDateString('en-us', { year:"2-digit", month:"2-digit", day:"2-digit"});
     var partsDate = date.split('/');
     const initializeCode = `${partsDate[0]}${partsDate[1]}${partsDate[2]}`;
     return initializeCode;
-  }
+}

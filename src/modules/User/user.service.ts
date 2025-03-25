@@ -70,7 +70,15 @@ export class UserService {
       },
       {
         path: 'idArea',
-        select: 'name acronym',
+        select: 'name acronym idResponsible',
+      },
+      {
+        path: 'idTeamwork',
+        select: 'name idResponsible',
+      },
+      {
+        path: 'idSubteamwork',
+        select: 'name floorNumber',
       }
     ]);
   }

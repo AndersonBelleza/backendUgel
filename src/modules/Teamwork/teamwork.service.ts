@@ -17,7 +17,22 @@ export class TeamworkService {
   }
 
   async listAsync ( data : any = {} ){
-    return await this.TeamworkModel.find( data );
+    return await this.TeamworkModel.find( data )
+    .populate([
+      {
+        path: 'idResponsible',
+        populate: [
+          {
+            path: 'idPerson',
+            select: 'name paternalSurname maternalSurname'
+          }
+        ]
+      },
+      {
+        path: 'idStatusType',
+        select: 'name color'
+      }
+    ]).exec();
   }
   
   async createTeamwork(crearTeamwork : object){

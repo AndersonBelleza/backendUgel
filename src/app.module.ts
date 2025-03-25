@@ -9,9 +9,11 @@ import { ConfigModule } from './modules/Config/config.module';
 import { AuthModule } from './modules/auth/auth-user.module';
 import { DoorControlModule } from './modules/DoorControl/doorControl.module';
 
-import { ImagesController, MakeImagesController, FilesController, FileController } from './modules/images/images.controller'
+import { ImagesController } from './modules/images/images.controller'
 import { TeamworkModule } from './modules/Teamwork/teamwork.module';
 import { SubteamworkModule } from './modules/Subteamwork/subteamwork.module';
+import { InterestLaborModule } from './modules/InterestLabor/interestLabor.module';
+import { PdfModule } from './modules/Pdf/pdf.module';
 
 @Module({
   imports: [
@@ -25,7 +27,9 @@ import { SubteamworkModule } from './modules/Subteamwork/subteamwork.module';
     TeamworkModule,
     SubteamworkModule,
     PersonModule,
-    DoorControlModule
+    DoorControlModule,
+    InterestLaborModule,
+    PdfModule
   ],
   controllers: [ ImagesController ],
   providers: [],

@@ -3,6 +3,7 @@ import { Area } from './area.schema';
 
 import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
+import path from 'path';
 
 @Injectable()
 export class AreaService {
@@ -17,7 +18,22 @@ export class AreaService {
   }
 
   async listAsync ( data : any = {} ){
-    return await this.AreaModel.find( data );
+    return await this.AreaModel.find( data )
+    .populate([
+      {
+        path: 'idResponsible',
+        populate: [
+          {
+            path: 'idPerson',
+            select: 'name paternalSurname maternalSurname'
+          }
+        ]
+      },
+      {
+        path: 'idStatusType',
+        select: 'name color'
+      }
+    ]).exec();
   }
   
   async createArea(crearArea : object){

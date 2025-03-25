@@ -29,6 +29,10 @@ export class SubteamworkService {
             }
           ])
         },
+        {
+          path: 'idStatusType',
+          select: 'name color'
+        }
       ])  
       .lean()
       .exec();;

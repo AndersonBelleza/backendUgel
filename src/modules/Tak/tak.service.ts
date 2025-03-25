@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { Tak } from './tak.schema';
 
-import { Model } from 'mongoose';
+import mongoose, { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 
 @Injectable()
@@ -10,6 +10,52 @@ export class TakService {
 
   async list(){
     return await this.TakModel.find();
+  }
+
+  async getResume(id: string) {
+    const resumen = await this.TakModel.aggregate([
+      {
+        $match: { idUser: new mongoose.Types.ObjectId(id) } // Convertir idUser a ObjectId
+      },
+      {
+        $group: {
+          _id: "$idStatusType",
+          count: { $sum: 1 }
+        }
+      },
+      {
+        $lookup: {
+          from: "statustypes", // Nombre de la colección de estados
+          localField: "_id",
+          foreignField: "_id",
+          as: "status"
+        }
+      },
+      {
+        $unwind: "$status"
+      },
+      {
+        $project: {
+          _id: 0,
+          statusName: "$status.name",
+          count: 1
+        }
+      }
+    ]);
+    // Obtener todos los estados posibles de la colección StatusType
+    const allStatuses = await this.TakModel.db.collection("statustypes").find({ type: "Tak" }).toArray();
+    // Crear un objeto con todos los estados posibles, inicializados en 0
+  const resumenFinal = allStatuses.reduce((acc, status) => {
+    acc[status.name] = 0;
+    return acc;
+  }, { Total: 0 }); // Se agrega el Total
+
+  // Rellenar los valores reales y calcular el total
+  resumen.forEach(({ statusName, count }) => {
+    resumenFinal[statusName] = count;
+    resumenFinal.Total += count;
+  });
+    return resumenFinal;
   }
 
   async listAsync(body: any, skip: number = 0, limit: any = null) {
@@ -69,17 +115,23 @@ export class TakService {
     ]);
     
     // Ordenar primero por 'En Proceso'
-    const sortedResults = paginatedResults.sort((a : any, b : any) => {
-      const statusA = a?.idStatusType?.name === 'En proceso' ? 0 : 1;
-      const statusB = b?.idStatusType?.name === 'En proceso' ? 0 : 1;
-      
+    const sortedResults = paginatedResults.sort((a: any, b: any) => {
+      const statusOrder = {
+        "En proceso": 0, // Primero
+        "Completado": 2, // Último
+      };
+  
+      const statusA = statusOrder[a?.idStatusType?.name] ?? 1;
+      const statusB = statusOrder[b?.idStatusType?.name] ?? 1;
+  
       if (statusA !== statusB) {
-        return statusA - statusB; // Si uno es 'En Proceso', va primero
+        return statusA - statusB; // 'En proceso' primero, 'Completado' al final
       }
-    
-      // Si ambos son iguales, ordenar por fecha de creación (descendente)
+  
+      // Si están en la misma categoría, ordenar por fecha descendente
       return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
     });
+  
     
     return {
       total: totalRecords,

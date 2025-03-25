@@ -76,7 +76,7 @@ export class TakController {
       const responseStatusType = await this.statusService.findOne({ type: 'Tak', name : 'Pendiente' });
       if( responseStatusType ) data.idStatusType = new mongoose.Types.ObjectId(responseStatusType?._id);
         
-      const { idUser, idStatusPriority } = data;
+      const { idUser, idStatusPriority, idArea, idTeamwork, idSubteamwork, idTechnical } = data;
 
       if (files?.files?.length > 0) {
         let evidence : any[] = files?.files?.map((img) => {
@@ -105,6 +105,11 @@ export class TakController {
       data.code = code;
       data.correlative = correlative + 1;
       if( idUser ) data.idUser = new mongoose.Types.ObjectId(idUser);
+      if( idArea ) data.idArea = new mongoose.Types.ObjectId(idArea);
+      if( idTeamwork ) data.idTeamwork = new mongoose.Types.ObjectId(idTeamwork);
+      if( idSubteamwork ) data.idSubteamwork = new mongoose.Types.ObjectId(idSubteamwork);
+      if( idTechnical ) data.idTechnical = new mongoose.Types.ObjectId(idTechnical);
+
       if( idStatusPriority ) data.idStatusPriority = new mongoose.Types.ObjectId(idStatusPriority);
 
       const TabuscarTak = await this.service.createTak(data);
@@ -124,12 +129,16 @@ export class TakController {
   async listAsyncTak(@Body() body: any, @Req() req?: Request){
     try {
       let skip = 0;
-      const { page, limit, code, correlative, idStatusType, idStatusPriority, idUser } = body;
+      const { page, limit, code, correlative, idStatusType, idStatusPriority, idUser, idArea, idTeamwork, idSubteamwork } = body;
 
       let newData : any = {};
 
       if( code ) newData.code = code;
       if( correlative ) newData.correlative = correlative;
+      
+      if( idArea ) newData.idArea = new mongoose.Types.ObjectId(idArea);
+      if( idTeamwork ) newData.idTeamwork = new mongoose.Types.ObjectId(idTeamwork);
+      if( idSubteamwork ) newData.idSubteamwork = new mongoose.Types.ObjectId(idSubteamwork);
       if( idStatusPriority ) newData.idStatusPriority = new mongoose.Types.ObjectId(idStatusPriority);
       if( idUser ) newData.idUser = new mongoose.Types.ObjectId(idUser);
 
@@ -244,12 +253,15 @@ export class TakController {
         data.evidence = [ ...fullTak.evidence, ...evidence ];
       } 
       
-      const { idStatusPriority, idStatusType,  idTimePeriod, idTechnical } = data; // TODO: Estos datos aparecen de "data"
+      const { idStatusPriority, idStatusType,  idTimePeriod, idTechnical, idArea, idTeamwork, idSubteamwork, idAssistant, } = data; // TODO: Estos datos aparecen de "data"
       if( idStatusPriority ) data.idStatusPriority = new mongoose.Types.ObjectId(idStatusPriority);
       if( idStatusType ) data.idStatusType = new mongoose.Types.ObjectId(idStatusType);
       if( idTimePeriod ) data.idTimePeriod = new mongoose.Types.ObjectId(idTimePeriod);
       if( idTechnical ) data.idTechnical = new mongoose.Types.ObjectId(idTechnical);
-      
+      if( idArea ) data.idArea = new mongoose.Types.ObjectId(idArea);
+      if( idTeamwork ) data.idTeamwork = new mongoose.Types.ObjectId(idTeamwork);
+      if( idSubteamwork ) data.idSubteamwork = new mongoose.Types.ObjectId(idSubteamwork);
+
       // * SE DEBE VALIDAR QUE TODOS LOS ID, SE GUARDEN COMO "OBJECTID"
       const updatedTak = await this.service.updateTak(id, data);
       if (!updatedTak) throw new NotFoundException('Item not found!');

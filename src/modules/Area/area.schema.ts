@@ -6,18 +6,20 @@ import { Types } from "mongoose";
 })
 
 export class Area {
-
-  @Prop({ type: Types.ObjectId, ref: 'StatusType' })
-  idStatusType: Types.ObjectId;
+  @Prop({ default: '0', type: String })
+  bool: string;
 
   @Prop({ required: true, unique: true })
   name: string;
 
-  @Prop({ default: '0', type: String })
-  bool: string;
-
   @Prop({ type: String })
   acronym: string;
+
+  @Prop({ type: Types.ObjectId, ref: 'User', required: false })
+  idResponsible?: Types.ObjectId;
+
+  @Prop({ type: Types.ObjectId, ref: 'StatusType' })
+  idStatusType: Types.ObjectId;
   
 }
 

@@ -15,6 +15,9 @@ export class Teamwork {
   
   @Prop({ type: Types.ObjectId, ref: 'Area' })
   idArea: Types.ObjectId;
+
+  @Prop({ type: Types.ObjectId, ref: 'User', required: false })
+  idResponsible?: Types.ObjectId;
   
   @Prop({ type: Types.ObjectId, ref: 'StatusType' })
   idStatusType: Types.ObjectId;

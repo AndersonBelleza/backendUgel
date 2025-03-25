@@ -31,10 +31,19 @@ export class Tak {
   @Prop({ type: String })
   recommendation: string;
 
-  @Prop({ type: Types.ObjectId, ref: 'User' })
+  @Prop({ type: Types.ObjectId, ref: 'Area' }) //! Area que registra ()
+  idArea: Types.ObjectId;
+
+  @Prop({ type: Types.ObjectId, ref: 'Teamwork' }) //! Teamwork FUNCIONARIO ()
+  idTeamwork?: Types.ObjectId;
+
+  @Prop({ type: Types.ObjectId, ref: 'Subteamwork' }) // Usuario TECNICO/INFORMATICO ()
+  idSubteamwork?: Types.ObjectId;
+
+  @Prop({ type: Types.ObjectId, ref: 'User' }) // Usuario que registra - JEFE ()
   idUser: Types.ObjectId;
 
-  @Prop({ type: Types.ObjectId, ref: 'User' })
+  @Prop({ type: Types.ObjectId, ref: 'User' }) // Usuario TECNICO/INFORMATICO ()
   idTechnical?: Types.ObjectId;
 
   @Prop({ type: Types.ObjectId, ref: 'StatusType' })

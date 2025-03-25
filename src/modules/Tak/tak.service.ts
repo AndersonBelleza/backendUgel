@@ -12,10 +12,10 @@ export class TakService {
     return await this.TakModel.find();
   }
 
-  async getResume(idUser: string) {
+  async getResume(id: string) {
     const resumen = await this.TakModel.aggregate([
       {
-        $match: { idUser: new mongoose.Types.ObjectId(idUser) } // Convertir idUser a ObjectId
+        $match: { idUser: new mongoose.Types.ObjectId(id) } // Convertir idUser a ObjectId
       },
       {
         $group: {
@@ -115,17 +115,23 @@ export class TakService {
     ]);
     
     // Ordenar primero por 'En Proceso'
-    const sortedResults = paginatedResults.sort((a : any, b : any) => {
-      const statusA = a?.idStatusType?.name === 'En proceso' ? 0 : 1;
-      const statusB = b?.idStatusType?.name === 'En proceso' ? 0 : 1;
-      
+    const sortedResults = paginatedResults.sort((a: any, b: any) => {
+      const statusOrder = {
+        "En proceso": 0, // Primero
+        "Completado": 2, // Último
+      };
+  
+      const statusA = statusOrder[a?.idStatusType?.name] ?? 1;
+      const statusB = statusOrder[b?.idStatusType?.name] ?? 1;
+  
       if (statusA !== statusB) {
-        return statusA - statusB; // Si uno es 'En Proceso', va primero
+        return statusA - statusB; // 'En proceso' primero, 'Completado' al final
       }
-    
-      // Si ambos son iguales, ordenar por fecha de creación (descendente)
+  
+      // Si están en la misma categoría, ordenar por fecha descendente
       return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
     });
+  
     
     return {
       total: totalRecords,

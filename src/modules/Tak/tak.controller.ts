@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Param, Delete, HttpCode, NotFoundException, Req, Put, ConflictException, UseInterceptors, UploadedFiles, BadRequestException } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Delete, HttpCode, NotFoundException, Req, Put, ConflictException, UseInterceptors, UploadedFiles, BadRequestException, InternalServerErrorException } from '@nestjs/common';
 import { TakService } from './tak.service';
 import { WebSocketGateway } from './tak.gateway';
 import { StatusTypeService } from '../statusType/statusType.service';
@@ -22,9 +22,24 @@ export class TakController {
     return this.service.list();
     
   }
+  
   @Get('resume/:idUser')
-  async getResume(@Param('idUser') idUser: string) {
-    return this.service.getResume(idUser);
+  async getResume(@Param('idUser') idUser: any) {
+    // Verifica si el idUser es válido antes de intentar convertirlo a ObjectId
+    if (!mongoose.Types.ObjectId.isValid(idUser)) {
+      throw new BadRequestException('El ID de usuario proporcionado no es válido');
+    }
+    try {
+      // Convierte el idUser en un ObjectId
+      idUser = new mongoose.Types.ObjectId(idUser);
+  
+      // Llama al servicio para obtener el "resume"
+      const resume = await this.service.getResume(idUser);
+      return resume;
+    } catch (error) {
+      console.error('Error al obtener el resume:', error);
+      throw new InternalServerErrorException('Hubo un problema al obtener el resume');
+    }
   }
   @Post()
   @UseInterceptors(
@@ -142,7 +157,7 @@ export class TakController {
         const responseDefault = await this.statusService.findAll({ type: 'Tak' });
 
         const statusIds = responseDefault
-          .filter((item: any) => item?.name === 'Pendiente' || item?.name === 'En proceso') // Filtra los dos estados
+          .filter((item: any) => item?.name === 'Pendiente' || item?.name === 'En proceso'|| item?.name === 'Completado') // Filtra los dos estados
           .map((item: any) => new mongoose.Types.ObjectId(item?._id)); // Mapea solo los _id
       
         if (statusIds.length > 0) {

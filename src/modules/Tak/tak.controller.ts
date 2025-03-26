@@ -166,7 +166,7 @@ export class TakController {
         const responseDefault = await this.statusService.findAll({ type: 'Tak' });
 
         const statusIds = responseDefault
-          .filter((item: any) => item?.name === 'Pendiente' || item?.name === 'En proceso'|| item?.name === 'Completado') // Filtra los dos estados
+          .filter((item: any) => item?.name === 'Pendiente' || item?.name === 'En proceso'|| item?.name === 'Completado' || item?.name === 'En revision') // Filtra los dos estados
           .map((item: any) => new mongoose.Types.ObjectId(item?._id)); // Mapea solo los _id
       
         if (statusIds.length > 0) {
@@ -341,11 +341,11 @@ export class TakController {
       if (typeof qualification !== 'number' || qualification < 1 || qualification > 5) {
         throw new BadRequestException('La calificación debe estar entre 1 y 5');
       }
-      // // Obtener el estado "Calificado"
-      // const responseStatusType = await this.statusService.findOne({ type: 'Tak', name: 'Calificado' });
-      // if (responseStatusType) {
-      //   data.idStatusType = new mongoose.Types.ObjectId(responseStatusType._id);
-      // }
+      // Obtener el estado "Calificado"
+      const responseStatusType = await this.statusService.findOne({ type: 'Tak', name: 'Completado' });
+      if (responseStatusType) {
+        data.idStatusType = new mongoose.Types.ObjectId(responseStatusType._id);
+      }
       // Agregar la calificación a los datos que se actualizarán
       data.qualification = qualification;
       // Actualizar el ítem con la calificación

@@ -119,7 +119,7 @@ export class TakController {
           $lt: endOfDay.toISOString()
         }
       });
-
+      data.qualification=0;
       data.code = code;
       data.correlative = correlative + 1;
       if( idUser ) data.idUser = new mongoose.Types.ObjectId(idUser);
@@ -337,29 +337,23 @@ export class TakController {
     try { 
       let data: any = {};
       const { qualification } = body;
-
       // Validación de calificación (debe ser un número entre 1 y 5)
       if (typeof qualification !== 'number' || qualification < 1 || qualification > 5) {
         throw new BadRequestException('La calificación debe estar entre 1 y 5');
       }
-
       // // Obtener el estado "Calificado"
       // const responseStatusType = await this.statusService.findOne({ type: 'Tak', name: 'Calificado' });
       // if (responseStatusType) {
       //   data.idStatusType = new mongoose.Types.ObjectId(responseStatusType._id);
       // }
-
       // Agregar la calificación a los datos que se actualizarán
       data.qualification = qualification;
-
       // Actualizar el ítem con la calificación
       const updatedTak = await this.service.updateTak(id, data);
       if (!updatedTak) throw new NotFoundException('Ítem no encontrado');
-
       // Emitir evento WebSocket para notificar la actualización
       this.gateway.emitEvent('takUpdate', await this.listAsyncTak({}));
-
-      return { message: 'Calificación actualizada correctamente', updatedTak };
+      return updatedTak;
     } catch (error) {
       throw error;
     }

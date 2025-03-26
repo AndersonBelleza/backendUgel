@@ -41,6 +41,7 @@ export class Tak {
   idSubteamwork?: Types.ObjectId;
 
   @Prop({ type: Types.ObjectId, ref: 'User' }) // Usuario que registra - JEFE ()
+  
   @Prop({ default: '0', type: Number })
   qualification: number;
   

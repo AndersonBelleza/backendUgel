@@ -42,21 +42,20 @@ export class TakService {
         }
       }
     ]);
-    // Obtener todos los estados posibles de la colección StatusType
-    const allStatuses = await this.TakModel.db.collection("statustypes").find({ type: "Tak" }).toArray();
-    // Crear un objeto con todos los estados posibles, inicializados en 0
-  const resumenFinal = allStatuses.reduce((acc, status) => {
-    acc[status.name] = 0;
-    return acc;
-  }, { Total: 0 }); // Se agrega el Total
 
-  // Rellenar los valores reales y calcular el total
-  resumen.forEach(({ statusName, count }) => {
-    resumenFinal[statusName] = count;
-    resumenFinal.Total += count;
-  });
-    return resumenFinal;
-  }
+      const allStatuses = await this.TakModel.db.collection("statustypes").find({ type: "Tak" }).toArray();
+
+      const resumenFinal = allStatuses.reduce((acc, status) => {
+        acc[status.name] = 0;
+        return acc;
+      }, { Total: 0 }); 
+
+      resumen.forEach(({ statusName, count }) => {
+        resumenFinal[statusName] = count;
+        resumenFinal.Total += count;
+      });
+      return resumenFinal;
+    }
 
   async listAsync(body: any, skip: number = 0, limit: any = null) {
     const totalRecordsQuery = this.TakModel.countDocuments(body);
@@ -131,7 +130,6 @@ export class TakService {
       // Si están en la misma categoría, ordenar por fecha descendente
       return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
     });
-  
     
     return {
       total: totalRecords,

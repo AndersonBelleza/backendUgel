@@ -41,6 +41,7 @@ export class TakController {
       throw new InternalServerErrorException('Hubo un problema al obtener el resume');
     }
   }
+
   @Post()
   @UseInterceptors(
     FileFieldsInterceptor([

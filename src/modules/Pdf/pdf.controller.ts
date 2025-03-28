@@ -51,7 +51,7 @@ export class PdfController {
     
     const pdfResponse = await lastValueFrom(
         this.httpService
-            .post('http://localhost/generatePdf/request.php', data, {
+            .post('http://localhost/generate/request.php', data, {
                 responseType: 'arraybuffer',
                 headers: {
                     'Content-Type': 'application/json'

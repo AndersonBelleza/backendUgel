@@ -27,7 +27,7 @@ export class InterestLaborController {
   }
 
   @Put(':id')
-  async actualizarInterestLabor(@Param('id')  id : string, @Body() body: any, @Req() req: Request){
+  async updateInterestLabor(@Param('id')  id : string, @Body() body: any, @Req() req: Request){
     const res = await this.service.updateInterestLabor(id, body);
     if(!res) throw new NotFoundException('Item not found!');
     return res;

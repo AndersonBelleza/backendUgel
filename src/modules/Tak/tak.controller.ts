@@ -114,11 +114,13 @@ export class TakController {
       } 
 
       // ! Asignar codigo por defecto
-      const code = generateCodeIssue();
-
+      // const code = generateCodeIssue();
+      const code = new Date().getFullYear();
+      
       const today = new Date();
       const startOfDay = new Date(today.setHours(0, 0, 0, 0));
       const endOfDay = new Date(today.setHours(23, 59, 59, 999));
+      
       const correlative = await this.service.countTak({
         createdAt: {
           $gte: startOfDay.toISOString(),
@@ -174,11 +176,11 @@ export class TakController {
         const responseDefault = await this.statusService.findAll({ type: 'Tak' });
 
         const statusIds = responseDefault
-          .filter((item: any) => item?.name === 'Pendiente' || item?.name === 'En proceso'|| item?.name === 'Completado' || item?.name === 'En revision') // Filtra los dos estados
+          .filter((item: any) => item?.name === 'En proceso' || item?.name === 'Pendiente') // Filtra los dos estados
           .map((item: any) => new mongoose.Types.ObjectId(item?._id)); // Mapea solo los _id
       
         if (statusIds.length > 0) {
-          newData.idStatusType = { $in: statusIds }; // Usa $in para buscar por varios valores
+          newData.idStatusType = { $in: statusIds };
         }
       }
 

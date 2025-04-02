@@ -104,7 +104,7 @@ export class TakService {
     ])
     .skip(skip)
     .limit(limit)
-    .sort({ createdAt: -1 })      
+    .sort({ createdAt: - 1 })      
     .lean()
     .exec();
 
@@ -117,16 +117,16 @@ export class TakService {
     const sortedResults = paginatedResults.sort((a: any, b: any) => {
       const statusOrder = {
         "En proceso": 0, // Primero
-        "Completado": 2, // Último
+        "Pendiente": 1,  // Segundo
       };
-  
-      const statusA = statusOrder[a?.idStatusType?.name] ?? 1;
-      const statusB = statusOrder[b?.idStatusType?.name] ?? 1;
-  
+    
+      const statusA = statusOrder[a?.idStatusType?.name] ?? 2;
+      const statusB = statusOrder[b?.idStatusType?.name] ?? 2;
+    
       if (statusA !== statusB) {
-        return statusA - statusB; // 'En proceso' primero, 'Completado' al final
+        return statusA - statusB; // Ordena según la prioridad definida en `statusOrder`
       }
-  
+    
       // Si están en la misma categoría, ordenar por fecha descendente
       return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
     });

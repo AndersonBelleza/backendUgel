@@ -62,6 +62,9 @@ export class Tak {
 
   @Prop({default: [], type: [Object]})
   evidence?: [];
+
+  @Prop({default: [], type: [Object]})
+  evidenceUser?: [];
   
 }
 

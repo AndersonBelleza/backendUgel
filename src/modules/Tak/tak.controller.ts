@@ -46,6 +46,7 @@ export class TakController {
   @UseInterceptors(
     FileFieldsInterceptor([
       { name: 'files', maxCount: 100 },
+      { name: 'filesUser', maxCount: 100 },
     ], {
       fileFilter: (req, file, callback) => {
         // Obtener la extensión del archivo
@@ -70,6 +71,10 @@ export class TakController {
           if (file.fieldname === 'files') {
             destinationPath = 'src/assets/files/tak/';
           }
+
+          if (file.fieldname === 'filesUser') {
+            destinationPath = 'src/assets/files/takUser/';
+          }
           callback(null, destinationPath);
         },
         filename: (req, file, callback) => {
@@ -79,7 +84,7 @@ export class TakController {
       }),
     }),
   )
-  async create(@UploadedFiles() files: { files?: any[] }, @Body() body: any, @Req() req: Request){
+  async create(@UploadedFiles() files: { files?: any[] , filesUser?: any[] }, @Body() body: any, @Req() req: Request){
     try {
 
       var data: any = {};
@@ -97,15 +102,15 @@ export class TakController {
         
       const { idUser, idStatusPriority, idArea, idTeamwork, idSubteamwork, idTechnical } = data;
 
-      if (files?.files?.length > 0) {
-        let evidence : any[] = files?.files?.map((img) => {
+      if (files?.filesUser?.length > 0) {
+        let evidence : any[] = files?.filesUser?.map((img) => {
           return {
             name: img.filename,
             type: img.mimetype,
             url: img.path,
           }
         });
-        data.evidence = evidence
+        data.evidenceUser = evidence
       } 
 
       // ! Asignar codigo por defecto
@@ -120,7 +125,8 @@ export class TakController {
           $lt: endOfDay.toISOString()
         }
       });
-      data.qualification=0;
+
+      data.qualification = 0;
       data.code = code;
       data.correlative = correlative + 1;
       if( idUser ) data.idUser = new mongoose.Types.ObjectId(idUser);
@@ -131,6 +137,7 @@ export class TakController {
 
       if( idStatusPriority ) data.idStatusPriority = new mongoose.Types.ObjectId(idStatusPriority);
 
+      console.log(data);
       const TabuscarTak = await this.service.createTak(data);
 
       this.gateway.emitEvent('takAdded', await this.listAsyncTak({}));
@@ -210,6 +217,7 @@ export class TakController {
   @UseInterceptors(
     FileFieldsInterceptor([
       { name: 'files', maxCount: 100 },
+      { name: 'filesUser', maxCount: 100 },
     ], {
       fileFilter: (req, file, callback) => {
         // Obtener la extensión del archivo
@@ -234,6 +242,10 @@ export class TakController {
           if (file.fieldname === 'files') {
             destinationPath = 'src/assets/files/tak/';
           }
+
+          if (file.fieldname === 'filesUser') {
+            destinationPath = 'src/assets/files/takUser/';
+          }
           callback(null, destinationPath);
         },
         filename: (req, file, callback) => {
@@ -243,7 +255,7 @@ export class TakController {
       }),
     }),
   )
-  async update(@UploadedFiles() files: { files?: any[] }, @Body() body: any, @Req() req: Request) {
+  async update(@UploadedFiles() files: { files?: any[], filesUser?: any[],  }, @Body() body: any, @Req() req: Request) {
     try {
       var data: any = {};
 
@@ -257,6 +269,7 @@ export class TakController {
 
       const id = JSON.parse(body.id);
 
+      console.log(body)
       // Buscamos el TAK.
       const fullTak = await this.service.findById(id);
       if (!fullTak) throw new NotFoundException('Item not found after update!');
@@ -270,6 +283,17 @@ export class TakController {
           }
         });
         data.evidence = [ ...fullTak.evidence, ...evidence ];
+      } 
+
+      if (files?.filesUser?.length > 0) {
+        let evidence : any[] = files?.filesUser?.map((img) => {
+          return {
+            name: img.filename,
+            type: img.mimetype,
+            url: img.path,
+          }
+        });
+        data.evidence = [ ...fullTak.evidenceUser, ...evidence ];
       } 
       
       const { idStatusPriority, idStatusType,  idTimePeriod, idTechnical, idArea, idTeamwork, idSubteamwork, idAssistant, } = data; // TODO: Estos datos aparecen de "data"
@@ -315,6 +339,7 @@ export class TakController {
       throw error;
     }
   }
+
   @Put('cancelTak/:id')
   async cancelTak(@Param('id')  id : string, @Body() body: any, @Req() req: Request) {
     try { 

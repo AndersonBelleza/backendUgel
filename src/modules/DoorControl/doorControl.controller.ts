@@ -47,7 +47,6 @@ export class DoorControlController {
       const idDoorControl = existsDoorControlCode?._id;
 
       // Se obtiene todos los datos de la persona a registrar
-      console.log(body);
       const response = await this.service.updateDoorControlOfPerson(idDoorControl.toString(), body);
       return response;
 

@@ -8,8 +8,8 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   app.enableCors({ 
     allowedHeaders: ["*"], 
-    // origin: ["https://semi.nom.pe", /^http?:\/\/localhost:\d+$/, "https://www.semi.nom.pe"],
-    origin: [/^http?:\/\/localhost:\d+$/],
+    // origin: ["https://semi.nom.pe", /^http?:\/\/172.16.14.152:\d+$/, "https://www.semi.nom.pe"],
+    origin: [/^http?:\/\/172.16.14.152:\d+$/],
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE"]
   });

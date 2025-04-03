@@ -116,17 +116,8 @@ export class TakController {
       // ! Asignar codigo por defecto
       // const code = generateCodeIssue();
       const code = new Date().getFullYear();
-      
-      const today = new Date();
-      const startOfDay = new Date(today.setHours(0, 0, 0, 0));
-      const endOfDay = new Date(today.setHours(23, 59, 59, 999));
-      
-      const correlative = await this.service.countTak({
-        createdAt: {
-          $gte: startOfDay.toISOString(),
-          $lt: endOfDay.toISOString()
-        }
-      });
+
+      const correlative = await this.service.countTak();
 
       data.qualification = 0;
       data.code = code;
@@ -139,7 +130,6 @@ export class TakController {
 
       if( idStatusPriority ) data.idStatusPriority = new mongoose.Types.ObjectId(idStatusPriority);
 
-      console.log(data);
       const TabuscarTak = await this.service.createTak(data);
 
       this.gateway.emitEvent('takAdded', await this.listAsyncTak({}));

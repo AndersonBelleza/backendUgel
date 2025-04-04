@@ -6,7 +6,7 @@ import path from "path";
 
 @Injectable()
 export class CommomIssueService {
-  constructor(@InjectModel(CommomIssue.name) private CommomIssueModel:Model<CommomIssue>){}
+  constructor(@InjectModel(CommomIssue.name) private CommomIssueModel : Model<CommomIssue>) {}
 
   async CommomIssueAsync(body: any, skip: number = 0, limit: any = null) {
     const totalRecordsQuery = this.CommomIssueModel.countDocuments(body);

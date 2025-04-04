@@ -14,6 +14,7 @@ import { TeamworkModule } from './modules/Teamwork/teamwork.module';
 import { SubteamworkModule } from './modules/Subteamwork/subteamwork.module';
 import { InterestLaborModule } from './modules/InterestLabor/interestLabor.module';
 import { PdfModule } from './modules/Pdf/pdf.module';
+import { CommmomIssueModule } from './modules/commomIssue/commomIssue.module';
 
 @Module({
   imports: [
@@ -29,7 +30,8 @@ import { PdfModule } from './modules/Pdf/pdf.module';
     PersonModule,
     DoorControlModule,
     InterestLaborModule,
-    PdfModule
+    PdfModule,
+    CommmomIssueModule
   ],
   controllers: [ ImagesController ],
   providers: [],

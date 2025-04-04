@@ -16,7 +16,7 @@ export class WebSocketGateway implements OnModuleInit {
 
     // Iniciar el servidor en un puerto específico
     httpServer.listen(3001, () => {
-      console.log('WebSocket Server is running on http://172.16.14.152:3001');
+      console.log('WebSocket Server is running on http://localhost:3001');
     });
 
     this.handleSocketConnections();

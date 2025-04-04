@@ -10,7 +10,7 @@ export class MailService {
   async sendMail(data: {operacion?: string, correo: string, header: string, content: string, footer?: string}): Promise<any> {
     data.operacion = 'enviarSMS';
     const response = await lastValueFrom(
-      this.httpService.post('http://172.16.14.152:4444/correo.php', data, {
+      this.httpService.post('http://localhost:4444/correo.php', data, {
         responseType: 'json',
         headers: {
           'Content-Type': 'application/json',

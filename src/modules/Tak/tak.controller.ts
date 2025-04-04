@@ -157,11 +157,14 @@ export class TakController {
       if( idArea ) newData.idArea = new mongoose.Types.ObjectId(idArea);
       if( idTeamwork ) newData.idTeamwork = new mongoose.Types.ObjectId(idTeamwork);
       if( idSubteamwork ) newData.idSubteamwork = new mongoose.Types.ObjectId(idSubteamwork);
-      if( idStatusPriority ) newData.idStatusPriority = new mongoose.Types.ObjectId(idStatusPriority);
       if( idUser ) newData.idUser = new mongoose.Types.ObjectId(idUser);
 
+      if( idStatusPriority )  {
+        if(idStatusPriority != 'TODOS') newData.idStatusPriority = new mongoose.Types.ObjectId(idStatusPriority);
+      }
+
       if( idStatusType ) {
-        newData.idStatusType = new mongoose.Types.ObjectId(idStatusType);
+        if( idStatusType != 'TODOS' ) newData.idStatusType = new mongoose.Types.ObjectId(idStatusType);
       }else {
         const responseDefault = await this.statusService.findAll({ type: 'Tak' });
 

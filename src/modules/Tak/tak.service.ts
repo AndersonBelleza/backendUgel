@@ -104,7 +104,7 @@ export class TakService {
     ])
     .skip(skip)
     .limit(limit)
-    .sort({ createdAt: - 1 })      
+    .sort({ updatedAt: - 1 })      
     .lean()
     .exec();
 

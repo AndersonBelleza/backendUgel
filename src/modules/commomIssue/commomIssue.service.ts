@@ -11,20 +11,16 @@ export class CommomIssueService {
   async CommomIssueAsync(body: any, skip: number = 0, limit: any = null) {
     const totalRecordsQuery = this.CommomIssueModel.countDocuments(body);
     const paginatedResultsQuery = this.CommomIssueModel.find(body)
-      // .populate([
-      //   {
-      //     path: 'idStatusType',
-      //     select: 'name color'
-      //   },
-      //   {
-      //     path: 'idPerson',
-      //     select: 'firstName lastName'
-      //   },
-      //   {
-      //     path: 'idCommomIssue',
-      //     select: 'name floorNumber'
-      //   },
-      // ])
+      .populate([
+        {
+          path: 'idPriority',
+          select: 'name color'
+        },
+        {
+          path: 'idStatusType',
+          select: 'name color'
+        },
+      ])
       .skip(skip)
       .limit(limit)
       .sort({ createdAt: 'desc' })

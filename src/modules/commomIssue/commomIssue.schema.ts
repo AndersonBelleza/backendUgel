@@ -13,10 +13,10 @@ export class CommomIssue {
   @Prop({ type: String, required: true })
   issue: string;
 
-  @Prop({ type: Types.ObjectId, ref: 'Priority'})
+  @Prop({ type: Types.ObjectId, ref: 'StatusType'})
   idPriority: Types.ObjectId;
 
-  @Prop({ type: Types.ObjectId, ref: 'statusType'})
+  @Prop({ type: Types.ObjectId, ref: 'StatusType'})
   idStatusType: Types.ObjectId;
 }
 

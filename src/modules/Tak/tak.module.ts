@@ -6,6 +6,7 @@ import { Tak, TakSchema } from './tak.schema';
 import { WebSocketGateway } from './tak.gateway';
 import { UserModule } from '../User/user.module';
 import { StatusTypeModule } from '../statusType/statusType.module';
+import { TeamworkModule } from '../Teamwork/teamwork.module';
 
 @Module({
   imports: [
@@ -16,7 +17,8 @@ import { StatusTypeModule } from '../statusType/statusType.module';
       }
     ]),
     UserModule,
-    StatusTypeModule
+    StatusTypeModule,
+    TeamworkModule
   ],
   controllers: [ TakController ],
   providers: [ TakService, WebSocketGateway ],

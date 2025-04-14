@@ -55,7 +55,11 @@ export class TakService {
         resumenFinal.Total += count;
       });
       return resumenFinal;
-    }
+  }
+
+  async findAll( body : any = {}){
+    return await this.TakModel.find(body);
+  }
 
   async listAsync(body: any, skip: number = 0, limit: any = null) {
     const totalRecordsQuery = this.TakModel.countDocuments(body);
@@ -141,6 +145,96 @@ export class TakService {
   async countTak ( body : any = { }) {
     const totalRecordsQuery = this.TakModel.countDocuments(body);
     return totalRecordsQuery;
+  }
+
+  async countTakAreas ( ) {
+    return this.TakModel.aggregate([
+      {
+        $group : {
+          _id : "$idArea",
+          total: { $sum : 1 }
+        }
+      },
+      {
+        $lookup: {
+          from : "areas",
+          localField: '_id',
+          foreignField: '_id',
+          as: 'areaDetails'
+        }
+      },
+      {
+        $unwind: "$areaDetails"
+      },
+      {
+        $project: {
+          _id : 1,
+          name: "$areaDetails.name",
+          total: 1
+        }
+      }
+    ])
+  }
+
+  async countTeamwork ( ) {
+    return this.TakModel.aggregate([
+      {
+        $group : {
+          _id : "$idTeamwork",
+          total: { $sum : 1 }
+        }
+      },
+      {
+        $lookup: {
+          from : "teamworks",
+          localField: '_id',
+          foreignField: '_id',
+          as: 'teamworkDetails'
+        }
+      },
+      {
+        $unwind: "$teamworkDetails"
+      },
+      {
+        $project: {
+          _id : 1,
+          name: "$teamworkDetails.name",
+          idArea: "$teamworkDetails.idArea",
+          total: 1
+        }
+      }
+    ])
+  }
+
+  async countSubteamwork ( ) {
+    return this.TakModel.aggregate([
+      {
+        $group : {
+          _id : "$idSubteamwork",
+          total: { $sum : 1 }
+        }
+      },
+      {
+        $lookup: {
+          from : "subteamworks",
+          localField: '_id',
+          foreignField: '_id',
+          as: 'subteamworkDetails'
+        }
+      },
+      {
+        $unwind: "$subteamworkDetails"
+      },
+      {
+        $project: {
+          _id : 1,
+          idArea: "$subteamworkDetails.idArea",
+          name: "$subteamworkDetails.name",
+          idTeamwork: "$subteamworkDetails.idTeamwork",
+          total: 1
+        }
+      }
+    ])
   }
   
   async createTak(crearTak : object){

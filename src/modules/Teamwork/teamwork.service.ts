@@ -12,6 +12,10 @@ export class TeamworkService {
     return await this.TeamworkModel.find();
   }
 
+  async findAll( body = {} ){
+    return await this.TeamworkModel.find(body);
+  }
+
   async findOne( data : any = {} ){
     return await this.TeamworkModel.findOne( data );
   }

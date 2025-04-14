@@ -8,11 +8,13 @@ import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { extname } from 'path';
 import { randomUUID } from 'crypto';
 import { diskStorage } from 'multer';
+import { TeamworkService } from '../Teamwork/teamwork.service';
 
 @Controller('tak')
 export class TakController {
   constructor(
     private service: TakService, 
+    private teamworkservice : TeamworkService,
     private gateway: WebSocketGateway,
     private statusService: StatusTypeService
   ){}
@@ -375,6 +377,22 @@ export class TakController {
       // Emitir evento WebSocket para notificar la actualización
       this.gateway.emitEvent('takUpdate', await this.listAsyncTak({}));
       return updatedTak;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  // Reportes
+  @Get('reportsCountTaks')
+  async reportsCountTaks ( @Req() req?: Request ){
+    try {
+
+      return {
+        area: await this.service.countTakAreas(),
+        teamwork: await this.service.countTeamwork(),
+        subteamwork: await this.service.countSubteamwork()
+      }
+
     } catch (error) {
       throw error;
     }

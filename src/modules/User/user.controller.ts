@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Param, Delete, HttpCode, NotFoundException, Req, Put, ConflictException } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Delete, HttpCode, NotFoundException, Req, Put, ConflictException, Res } from '@nestjs/common';
 import { UserService } from './user.service';
 import UserInterface from 'src/interfaces/User.interface';
 import * as bcrypt from 'bcryptjs'
@@ -7,6 +7,7 @@ import mongoose, { Types } from 'mongoose';
 import { PersonService } from '../Person/person.service';
 import { AreaService } from '../Area/area.service';
 import { SubteamworkService } from '../Subteamwork/subteamwork.service';
+import { Response } from 'express';
 
 @Controller('user')
 export class UserController {
@@ -228,6 +229,7 @@ export class UserController {
     }
   }
   
+  // ENDPOINT: Para cambiar la contraseña sin validar la contraseña actual
   @Put('updateUserPassword/:id')
   async updateUserPassword(@Param('id')  id : string, @Body() body: any, @Req() req: Request){
     try {
@@ -242,6 +244,29 @@ export class UserController {
       if(error.code === 11000){
         throw new ConflictException('The element already exists');
       }
+      throw error;
+    }
+  }
+
+  // ENDPOINT : Para cambiar la contraseña validando la contraseña actual y la nueva.
+  @Put('updateUserInterfacePassword/:id')
+  async updateUserInterfacePassword(@Param('id')  id : string, @Body() body: any, @Res() res: Response, @Req() req: Request){
+    try {
+      const userFound:any = await this.service.findOne({ _id : new mongoose.Types.ObjectId(id) });
+      if(!userFound) return res.json({ message: "Usuario no encontrado."});
+
+      const validation = await bcrypt.compare(body.passwordOld, userFound.password);
+      if(!validation) return res.json({ message: "La contraseña actual es incorrecta." });
+
+      const passwordEncrypted = await bcrypt.hash( body.password, 15 );
+      
+      const response = await this.service.updateUser( id, { password : passwordEncrypted });
+      if( !response ) return { message : 'Error al cambiar la contraseña'};
+      
+      console.log(response);
+      res.json(response);
+
+    } catch (error) {
       throw error;
     }
   }

@@ -13,7 +13,7 @@ import { StatusTypeModule } from "../statusType/statusType.module";
     }
   ]),
   CommmomIssueModule,
-  StatusTypeModule
+  StatusTypeModule,
   ],
   controllers:[CommomIssueController],
   providers:[CommomIssueService],

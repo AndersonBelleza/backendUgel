@@ -14,44 +14,24 @@ export class CommomIssueController{
   @Post('listAsync')
   async listAsyncCommomIssue(@Body() body: any, @Req() req: Request) {
     try {
-      // Buscar el estado "Activo"
       const responseStatusType = await this.statusTypeService.findOne({ name: 'Activo', type: 'Default' });
-  
-      // Depuración: Verificar si responseStatusType tiene el valor correcto
-      console.log('responseStatusType:', responseStatusType);
-  
-      // Si 'isActive' es true, asignar el idStatusType
       if (body.isActive === true) {
         if (!responseStatusType) {
           throw new Error('No se encontró el estado "Activo"');
         }
-        console.log("TRUEEEE");
-  
-        // Asegurarse de que body.idStatusType se asigna correctamente
         body.idStatusType = responseStatusType._id;  // Asignación correcta
       }
-  
-      // Si no se pasa 'isActive', aseguramos que no se aplique el filtro 'idStatusType'
       if (body.isActive === undefined) {
-        // Si no se pasa isActive, no establecer ningún filtro adicional
-        delete body.idStatusType;  // Aseguramos que no se agregue el filtro si no es necesario
+        delete body.idStatusType; 
       }
-  
-      // Depuración: Verificar el valor de body antes de la consulta
-      console.log('body antes de la consulta:', body);
-  
-      // Hacer la consulta
       const response = await this.commomIssueService.CommomIssueAsync(body);
-  
-      // Depuración: Verificar la respuesta de la consulta
-      console.log('respuesta de la consulta:', response);
-  
       return response;
     } catch (error) {
       console.error('Error en la consulta:', error);
       throw error;
     }
   }
+  
   @Post()
   async create(@Body() body:any, @Req() req:Request){
     try{

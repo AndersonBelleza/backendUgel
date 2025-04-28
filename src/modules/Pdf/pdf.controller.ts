@@ -6,10 +6,14 @@ import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { extname } from 'path';
 import { diskStorage } from 'multer';
 import mongoose from 'mongoose';
+import { TakService } from '../Tak/tak.service';
 
 @Controller('pdf')
 export class PdfController {
-  constructor( private httpService: HttpService ) {}
+  constructor( 
+    private httpService: HttpService,
+    private takService : TakService
+   ) {}
 
   @UseInterceptors(
     FileFieldsInterceptor([
@@ -110,38 +114,79 @@ export class PdfController {
     const payload = JSON.parse(body['data']);
 
     let newData : any = {};
-    const { idArea, idTeamwork, idSubteamwork } = payload;
+      
+    const { idArea, idTeamwork, idSubteamwork, dateInit, dateEnd, idStatusPriority, idStatusType } = payload;
 
-    if( idArea ) newData.idArea = new mongoose.Types.ObjectId(idArea);
-    if( idTeamwork ) newData.idTeamwork = new mongoose.Types.ObjectId(idTeamwork);
-    if( idSubteamwork ) newData.idSubteamwork = new mongoose.Types.ObjectId(idSubteamwork);
+    if (dateInit && dateEnd) {
+        newData.dateAtenttion = {
+            $gte: new Date(dateInit).toISOString(),
+            $lte: new Date(dateEnd).toISOString()
+        };
+    } else if (dateInit) {
+        newData.dateAtenttion = {
+            $gte: new Date(dateInit).toISOString()
+        };
+    } else if (dateEnd) {
+        newData.dateAtenttion = {
+            $lte: new Date(dateEnd).toISOString()
+        };
+    }
 
-    const data = { 
-        operation: 'TakReport', 
-        content: body,
-    };
+    if( idStatusPriority )  {
+    if(idStatusPriority != 'TODOS') newData.idStatusPriority = new mongoose.Types.ObjectId(idStatusPriority);
+    }
+
+    if( idStatusType ) {
+    if( idStatusType != 'TODOS' ) newData.idStatusType = new mongoose.Types.ObjectId(idStatusType);
+    }
     
-    // const pdfResponse = await lastValueFrom(
-    //     this.httpService
-    //         .post('http://localhost/generate/request.php', data, {
-    //             responseType: 'arraybuffer',
-    //             headers: {
-    //                 'Content-Type': 'application/json'
-    //             },
-    //         })
-    //         .pipe(
-    //             map((response) => {
-    //                 return response.data;
-    //             }),
-    //         ),
-    // );
-  
-  
-    // const pdfBuffer = Buffer.from(pdfResponse, 'binary');
-  
-    // res.setHeader('Content-Type', 'application/pdf');
-    // res.setHeader('Content-Disposition', 'attachment; filename="documento.pdf"');
-    // res.status(200).send(pdfBuffer);
+    // Validar y asignar los filtros
+    if (idArea && idArea !== 'TODOS') {
+        newData.idArea = new mongoose.Types.ObjectId(idArea);   
+    }
+
+    if (idTeamwork && idTeamwork !== 'TODOS') {
+        newData.idTeamwork = new mongoose.Types.ObjectId(idTeamwork);
+    }
+
+    if (idSubteamwork && idSubteamwork !== 'TODOS') {
+        newData.idSubteamwork = new mongoose.Types.ObjectId(idSubteamwork);
+    }
+
+
+    const response = await this.takService.findAll(newData);
+
+    if( response.length > 0 ) {
+        
+        const data = { 
+            operation: 'TakReport', 
+            content: JSON.stringify(response),
+        };
+
+        console.log(data)
+    
+        const pdfResponse = await lastValueFrom(
+            this.httpService
+                .post('http://localhost/generate/request.php', data, {
+                    responseType: 'arraybuffer',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                })
+                .pipe(
+                    map((response) => {
+                        return response.data;
+                    }),
+                ),
+        );
+      
+      
+        const pdfBuffer = Buffer.from(pdfResponse, 'binary');
+      
+        res.setHeader('Content-Type', 'application/pdf');
+        res.setHeader('Content-Disposition', 'attachment; filename="documento.pdf"');
+        res.status(200).send(pdfBuffer);
+    }
   }
   
 }

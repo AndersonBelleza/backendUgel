@@ -147,8 +147,11 @@ export class TakService {
     return totalRecordsQuery;
   }
 
-  async countTakAreas ( ) {
+  async countTakAreas ( body : any ) {
     return this.TakModel.aggregate([
+      {
+        $match: body  // Aquí se usa el body tal como viene
+      },
       {
         $group : {
           _id : "$idArea",
@@ -176,8 +179,11 @@ export class TakService {
     ])
   }
 
-  async countTeamwork ( ) {
+  async countTeamwork ( body: any ) {
     return this.TakModel.aggregate([
+      {
+        $match: body  // Aquí se usa el body tal como viene
+      },
       {
         $group : {
           _id : "$idTeamwork",
@@ -206,8 +212,11 @@ export class TakService {
     ])
   }
 
-  async countSubteamwork ( ) {
+  async countSubteamwork ( body : any ) {
     return this.TakModel.aggregate([
+      {
+        $match: body  // Aquí se usa el body tal como viene
+      },
       {
         $group : {
           _id : "$idSubteamwork",

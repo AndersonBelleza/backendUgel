@@ -266,7 +266,6 @@ export class TakController {
 
       const id = JSON.parse(body.id);
 
-      console.log(body)
       // Buscamos el TAK.
       const fullTak = await this.service.findById(id);
       if (!fullTak) throw new NotFoundException('Item not found after update!');
@@ -293,7 +292,7 @@ export class TakController {
         data.evidence = [ ...fullTak.evidenceUser, ...evidence ];
       } 
       
-      const { idStatusPriority, idStatusType,  idTimePeriod, idTechnical, idArea, idTeamwork, idSubteamwork, idAssistant, } = data; // TODO: Estos datos aparecen de "data"
+      const { idStatusPriority, idStatusType,  idTimePeriod, idTechnical, idArea, idTeamwork, idSubteamwork, dateAttention, } = data; // TODO: Estos datos aparecen de "data"
       if( idStatusPriority ) data.idStatusPriority = new mongoose.Types.ObjectId(idStatusPriority);
       if( idStatusType ) data.idStatusType = new mongoose.Types.ObjectId(idStatusType);
       if( idTimePeriod ) data.idTimePeriod = new mongoose.Types.ObjectId(idTimePeriod);
@@ -301,6 +300,7 @@ export class TakController {
       if( idArea ) data.idArea = new mongoose.Types.ObjectId(idArea);
       if( idTeamwork ) data.idTeamwork = new mongoose.Types.ObjectId(idTeamwork);
       if( idSubteamwork ) data.idSubteamwork = new mongoose.Types.ObjectId(idSubteamwork);
+      if( dateAttention ) data.dateAttention = dateAttention;
 
       // * SE DEBE VALIDAR QUE TODOS LOS ID, SE GUARDEN COMO "OBJECTID"
       const updatedTak = await this.service.updateTak(id, data);
@@ -383,14 +383,64 @@ export class TakController {
   }
 
   // Reportes
-  @Get('reportsCountTaks')
-  async reportsCountTaks ( @Req() req?: Request ){
+  @Post('reportsCountTaks')
+  async reportsCountTaks (@Body() body: any, @Req() req?: Request ){
     try {
 
+      let newData : any = {};
+      
+      const { idArea, idTeamwork, idSubteamwork, dateInit, dateEnd, idStatusPriority, idStatusType } = body;
+    
+      if (dateInit && dateEnd) {
+          newData.dateAtenttion = {
+              $gte: new Date(dateInit).toISOString(),
+              $lte: new Date(dateEnd).toISOString()
+          };
+      } else if (dateInit) {
+          newData.dateAtenttion = {
+              $gte: new Date(dateInit).toISOString()
+          };
+      } else if (dateEnd) {
+          newData.dateAtenttion = {
+              $lte: new Date(dateEnd).toISOString()
+          };
+      }
+
+      if( idStatusPriority )  {
+        if(idStatusPriority != 'TODOS') newData.idStatusPriority = new mongoose.Types.ObjectId(idStatusPriority);
+      }
+
+      if( idStatusType ) {
+        if( idStatusType != 'TODOS' ) newData.idStatusType = new mongoose.Types.ObjectId(idStatusType);
+      }
+      
+      // Clonar newData para evitar referencias compartidas
+      let areaFilter = { ...newData };
+      let teamworkFilter = { ...newData };
+      let subteamworkFilter = { ...newData };
+
+      // Validar y asignar los filtros
+      if (idArea && idArea !== 'TODOS') {
+        const areaObjectId = new mongoose.Types.ObjectId(idArea);
+        areaFilter.idArea = areaObjectId;
+        teamworkFilter.idArea = areaObjectId;
+        subteamworkFilter.idArea = areaObjectId;
+      }
+
+      if (idTeamwork && idTeamwork !== 'TODOS') {
+        const teamworkObjectId = new mongoose.Types.ObjectId(idTeamwork);
+        teamworkFilter.idTeamwork = teamworkObjectId;
+        subteamworkFilter.idTeamwork = teamworkObjectId;
+      }
+
+      if (idSubteamwork && idSubteamwork !== 'TODOS') {
+        subteamworkFilter.idSubteamwork = new mongoose.Types.ObjectId(idSubteamwork);
+      }
+      
       return {
-        area: await this.service.countTakAreas(),
-        teamwork: await this.service.countTeamwork(),
-        subteamwork: await this.service.countSubteamwork()
+        area: await this.service.countTakAreas(areaFilter),
+        teamwork: await this.service.countTeamwork(teamworkFilter),
+        subteamwork: await this.service.countSubteamwork(subteamworkFilter)
       }
 
     } catch (error) {

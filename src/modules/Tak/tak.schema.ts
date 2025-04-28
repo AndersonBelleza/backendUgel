@@ -66,6 +66,9 @@ export class Tak {
   @Prop({default: [], type: [Object]})
   evidenceUser?: [];
   
+  @Prop({ type: Date, required: false }) // falta
+  dateAttention?: Date;
+  
 }
 
 export const TakSchema = SchemaFactory.createForClass(Tak);

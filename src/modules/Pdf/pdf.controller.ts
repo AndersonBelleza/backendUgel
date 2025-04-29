@@ -1,12 +1,13 @@
 import { Body, Controller, Get, Post, Req, Res, UseInterceptors } from '@nestjs/common';
 import { Response } from 'express';
-import { lastValueFrom, map } from 'rxjs';
+import { lastValueFrom, map, zip } from 'rxjs';
 import { HttpService } from '@nestjs/axios'
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { extname } from 'path';
 import { diskStorage } from 'multer';
 import mongoose from 'mongoose';
 import { TakService } from '../Tak/tak.service';
+import * as archiver from 'archiver'
 
 @Controller('pdf')
 export class PdfController {
@@ -153,18 +154,25 @@ export class PdfController {
         newData.idSubteamwork = new mongoose.Types.ObjectId(idSubteamwork);
     }
 
-
     const response = await this.takService.findAll(newData);
+    
+    var quantity = 200;
+    var array: any = [];
+    const zipeado = archiver('zip');
 
-    if( response.length > 0 ) {
-        
+    // Separamos los en arrays de 100 objetos
+    for (var i = 0; i < response.length; i += quantity) {
+        var subarray = response.slice(i, i + quantity);
+        array.push(subarray);
+    }
+
+    var returnPdfs: any[] = [];
+    for (let index = 0; index < array.length; index++) {
         const data = { 
             operation: 'TakReport', 
-            content: JSON.stringify(response),
+            content: JSON.stringify(array[index])
         };
 
-        console.log(data)
-    
         const pdfResponse = await lastValueFrom(
             this.httpService
                 .post('http://localhost/generate/request.php', data, {
@@ -179,14 +187,23 @@ export class PdfController {
                     }),
                 ),
         );
-      
-      
-        const pdfBuffer = Buffer.from(pdfResponse, 'binary');
-      
-        res.setHeader('Content-Type', 'application/pdf');
-        res.setHeader('Content-Disposition', 'attachment; filename="documento.pdf"');
-        res.status(200).send(pdfBuffer);
+
+        returnPdfs.push(pdfResponse);
     }
+
+    res.setHeader('Content-type', 'application/zip');
+    res.attachment(`ReporteTAK.zip`);
+    returnPdfs.forEach((pdfRes: any, index: any) => {
+      zipeado.append(pdfRes, {
+        name: `reporte-${index + 1}.pdf`,
+      });
+    });
+
+    zipeado.pipe(res);
+    zipeado.finalize();
+
+    return 
+
   }
   
 }

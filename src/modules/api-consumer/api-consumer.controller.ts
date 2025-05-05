@@ -34,6 +34,7 @@ export class ApiConsumerController {
         }
       }).pipe(
         map((response) => {
+          console.log(response)
           return response.data
         }),
         catchError((error) => {
@@ -41,6 +42,7 @@ export class ApiConsumerController {
         })
       )
     );
+    console.log(responseData)
 
     return responseData;
   }
@@ -67,6 +69,7 @@ export class ApiConsumerController {
         })
       )
     );
+    console.log(responseData)
 
     return responseData;
   }

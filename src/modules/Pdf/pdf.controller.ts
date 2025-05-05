@@ -173,6 +173,8 @@ export class PdfController {
             content: JSON.stringify(array[index])
         };
 
+        console.log(index);
+
         const pdfResponse = await lastValueFrom(
             this.httpService
                 .post('http://localhost/generate/request.php', data, {
@@ -190,7 +192,7 @@ export class PdfController {
 
         returnPdfs.push(pdfResponse);
     }
-
+    
     res.setHeader('Content-type', 'application/zip');
     res.attachment(`ReporteTAK.zip`);
     returnPdfs.forEach((pdfRes: any, index: any) => {

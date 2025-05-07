@@ -15,6 +15,7 @@ import { SubteamworkModule } from './modules/Subteamwork/subteamwork.module';
 import { InterestLaborModule } from './modules/InterestLabor/interestLabor.module';
 import { PdfModule } from './modules/Pdf/pdf.module';
 import { CommmomIssueModule } from './modules/commomIssue/commomIssue.module';
+import { HistoryInterestModule } from './modules/HistoryInterestLabor/HistoryInterest.module';
 
 @Module({
   imports: [
@@ -31,7 +32,8 @@ import { CommmomIssueModule } from './modules/commomIssue/commomIssue.module';
     DoorControlModule,
     InterestLaborModule,
     PdfModule,
-    CommmomIssueModule
+    CommmomIssueModule,
+    HistoryInterestModule
   ],
   controllers: [ ImagesController ],
   providers: [],

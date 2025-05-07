@@ -155,15 +155,14 @@ export class PdfController {
     }
 
     const response = await this.takService.findAll(newData);
-    
+
     var quantity = 200;
     var array: any = [];
     const zipeado = archiver('zip');
 
-    // Separamos los en arrays de 100 objetos
-    for (var i = 0; i < response.length; i += quantity) {
-        var subarray = response.slice(i, i + quantity);
-        array.push(subarray);
+    for (let i = 0; i < response.length; i += quantity) {
+        const chunk = response.slice(i, i + quantity);
+        array.push(chunk);
     }
 
     var returnPdfs: any[] = [];
@@ -172,8 +171,6 @@ export class PdfController {
             operation: 'TakReport', 
             content: JSON.stringify(array[index])
         };
-
-        console.log(index);
 
         const pdfResponse = await lastValueFrom(
             this.httpService
@@ -192,19 +189,17 @@ export class PdfController {
 
         returnPdfs.push(pdfResponse);
     }
-    
+
     res.setHeader('Content-type', 'application/zip');
     res.attachment(`ReporteTAK.zip`);
+
     returnPdfs.forEach((pdfRes: any, index: any) => {
       zipeado.append(pdfRes, {
         name: `reporte-${index + 1}.pdf`,
       });
     });
-
     zipeado.pipe(res);
     zipeado.finalize();
-
-    return 
 
   }
   

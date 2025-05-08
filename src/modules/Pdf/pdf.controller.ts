@@ -16,6 +16,7 @@ export class PdfController {
     private takService : TakService
    ) {}
 
+   // Interest Labor
   @UseInterceptors(
     FileFieldsInterceptor([
       { name: 'files', maxCount: 10 },
@@ -78,6 +79,7 @@ export class PdfController {
     res.status(200).send(pdfBuffer);
   }
 
+  // TAK
   @UseInterceptors(
     FileFieldsInterceptor([
       { name: 'files', maxCount: 10 },

@@ -22,7 +22,6 @@ export class TakController {
   @Get()
   buscar(@Req() req: Request){
     return this.service.list();
-    
   }
   
   @Get('resume/:idUser')
@@ -143,6 +142,54 @@ export class TakController {
       }
       throw error;
     }
+  }
+
+  @Post('listReport')
+  async listReport(@Body() body:any, @Req() req: Request) {  
+        
+      let newData : any = {};
+        
+      const { idArea, idTeamwork, idSubteamwork, dateInit, dateEnd, idStatusPriority, idStatusType } = body;
+  
+      if (dateInit && dateEnd) {
+          newData.dateAtenttion = {
+              $gte: new Date(dateInit).toISOString(),
+              $lte: new Date(dateEnd).toISOString()
+          };
+      } else if (dateInit) {
+          newData.dateAtenttion = {
+              $gte: new Date(dateInit).toISOString()
+          };
+      } else if (dateEnd) {
+          newData.dateAtenttion = {
+              $lte: new Date(dateEnd).toISOString()
+          };
+      }
+  
+      if( idStatusPriority )  {
+      if(idStatusPriority != 'TODOS') newData.idStatusPriority = new mongoose.Types.ObjectId(idStatusPriority);
+      }
+  
+      if( idStatusType ) {
+      if( idStatusType != 'TODOS' ) newData.idStatusType = new mongoose.Types.ObjectId(idStatusType);
+      }
+      
+      // Validar y asignar los filtros
+      if (idArea && idArea !== 'TODOS') {
+          newData.idArea = new mongoose.Types.ObjectId(idArea);   
+      }
+  
+      if (idTeamwork && idTeamwork !== 'TODOS') {
+          newData.idTeamwork = new mongoose.Types.ObjectId(idTeamwork);
+      }
+  
+      if (idSubteamwork && idSubteamwork !== 'TODOS') {
+          newData.idSubteamwork = new mongoose.Types.ObjectId(idSubteamwork);
+      }
+  
+      const response = await this.service.findAll(newData);
+
+      return response;
   }
 
   @Post('listAsync')

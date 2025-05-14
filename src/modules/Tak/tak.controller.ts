@@ -174,9 +174,9 @@ export class TakController {
       if( idStatusType != 'TODOS' ) newData.idStatusType = new mongoose.Types.ObjectId(idStatusType);
       }
 
-      if( idTechnical )  {
-          newData.idTechnical = new mongoose.Types.ObjectId(idTechnical);
-      }
+        if( idTechnical )  {
+            newData.idTechnical = new mongoose.Types.ObjectId(idTechnical);
+        }
       
       // Validar y asignar los filtros
       if (idArea && idArea !== 'TODOS') {

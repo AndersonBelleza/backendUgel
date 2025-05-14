@@ -118,7 +118,7 @@ export class PdfController {
 
     let newData : any = {};
       
-    const { idArea, idTeamwork, idSubteamwork, dateInit, dateEnd, idStatusPriority, idStatusType } = payload;
+    const { idArea, idTeamwork, idSubteamwork, dateInit, dateEnd, idStatusPriority, idStatusType, idTechnical } = payload;
 
     if (dateInit && dateEnd) {
         newData.dateAtenttion = {
@@ -135,8 +135,12 @@ export class PdfController {
         };
     }
 
+    if( idTechnical )  {
+        newData.idTechnical = new mongoose.Types.ObjectId(idTechnical);
+    }
+
     if( idStatusPriority )  {
-    if(idStatusPriority != 'TODOS') newData.idStatusPriority = new mongoose.Types.ObjectId(idStatusPriority);
+        if(idStatusPriority != 'TODOS') newData.idStatusPriority = new mongoose.Types.ObjectId(idStatusPriority);
     }
 
     if( idStatusType ) {

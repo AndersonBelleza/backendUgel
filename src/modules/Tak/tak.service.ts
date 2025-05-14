@@ -58,7 +58,51 @@ export class TakService {
   }
 
   async findAll( body : any = {}){
-    return await this.TakModel.find(body);
+    return await this.TakModel.find(body)
+    .populate([
+      {
+        path: 'idArea',
+        select: 'name acronym',
+      },
+      {
+        path: 'idUser',
+        select: 'username idArea idPerson',
+        populate: [
+          {
+            path: 'idPerson',
+            select: 'name paternalSurname maternalSurname',
+          },
+        ],
+      },
+      {
+        path: 'idTechnical',
+        select: 'username idArea idPerson',
+        populate: [
+          {
+            path: 'idPerson',
+            select: 'name paternalSurname maternalSurname',
+          },
+        ],
+      },
+      {
+        path: 'idTechnical',
+        select: 'username idArea idPerson',
+        populate: [
+          {
+            path: 'idPerson',
+            select: 'name paternalSurname maternalSurname',
+          },
+        ],
+      },
+      {
+        path: 'idStatusType',
+        select: 'name color'
+      }
+    ])
+
+    .sort({ updatedAt: - 1 })      
+    .lean()
+    .exec();
   }
 
   async listAsync(body: any, skip: number = 0, limit: any = null) {

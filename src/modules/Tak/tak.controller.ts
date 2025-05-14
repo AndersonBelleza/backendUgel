@@ -149,7 +149,7 @@ export class TakController {
         
       let newData : any = {};
         
-      const { idArea, idTeamwork, idSubteamwork, dateInit, dateEnd, idStatusPriority, idStatusType } = body;
+      const { idArea, idTeamwork, idSubteamwork, dateInit, dateEnd, idStatusPriority, idStatusType, idTechnical } = body;
   
       if (dateInit && dateEnd) {
           newData.dateAtenttion = {
@@ -172,6 +172,10 @@ export class TakController {
   
       if( idStatusType ) {
       if( idStatusType != 'TODOS' ) newData.idStatusType = new mongoose.Types.ObjectId(idStatusType);
+      }
+
+      if( idTechnical )  {
+          newData.idTechnical = new mongoose.Types.ObjectId(idTechnical);
       }
       
       // Validar y asignar los filtros
@@ -436,7 +440,7 @@ export class TakController {
 
       let newData : any = {};
       
-      const { idArea, idTeamwork, idSubteamwork, dateInit, dateEnd, idStatusPriority, idStatusType } = body;
+      const { idArea, idTeamwork, idSubteamwork, dateInit, dateEnd, idStatusPriority, idStatusType, idTechnical } = body;
     
       if (dateInit && dateEnd) {
           newData.dateAtenttion = {
@@ -451,6 +455,10 @@ export class TakController {
           newData.dateAtenttion = {
               $lte: new Date(dateEnd).toISOString()
           };
+      }
+
+      if( idTechnical )  {
+        newData.idTechnical = new mongoose.Types.ObjectId(idTechnical);
       }
 
       if( idStatusPriority )  {

@@ -202,14 +202,15 @@ export class TakController {
       let skip = 0;
       const { page, limit, code, correlative, idStatusType, idStatusPriority, idUser, idArea, idTeamwork, idSubteamwork } = body;
 
+      console.log(body)
       let newData : any = {};
 
       if( code ) newData.code = code;
       if( correlative ) newData.correlative = correlative;
       
-      if( idArea ) newData.idArea = new mongoose.Types.ObjectId(idArea);
-      if( idTeamwork ) newData.idTeamwork = new mongoose.Types.ObjectId(idTeamwork);
-      if( idSubteamwork ) newData.idSubteamwork = new mongoose.Types.ObjectId(idSubteamwork);
+      if( idArea && idArea != 'TODOS' ) newData.idArea = new mongoose.Types.ObjectId(idArea);
+      if( idTeamwork && idTeamwork != 'TODOS' ) newData.idTeamwork = new mongoose.Types.ObjectId(idTeamwork);
+      if( idSubteamwork && idSubteamwork != 'TODOS' ) newData.idSubteamwork = new mongoose.Types.ObjectId(idSubteamwork);
       if( idUser ) newData.idUser = new mongoose.Types.ObjectId(idUser);
 
       if( idStatusPriority )  {
@@ -222,8 +223,8 @@ export class TakController {
         const responseDefault = await this.statusService.findAll({ type: 'Tak' });
 
         const statusIds = responseDefault
-          .filter((item: any) => item?.name === 'En proceso' || item?.name === 'Pendiente') // Filtra los dos estados
-          .map((item: any) => new mongoose.Types.ObjectId(item?._id)); // Mapea solo los _id
+          .filter((item: any) => item?.name === 'En proceso' || item?.name === 'Pendiente')
+          .map((item: any) => new mongoose.Types.ObjectId(item?._id));
       
         if (statusIds.length > 0) {
           newData.idStatusType = { $in: statusIds };

@@ -251,15 +251,6 @@ export class TakController {
       throw error;
     }
 
-    try {
-      if (!idUser) {
-        throw new Error('El campo idUser es obligatorio');
-      }
-      const response = await this.service.listByUserAsync(body);
-      return response;
-    } catch (error) {
-      throw error;
-    }
   }
 
   @Post('update/')

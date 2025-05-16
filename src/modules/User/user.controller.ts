@@ -151,21 +151,31 @@ export class UserController {
     }
   }  
 
-  @Post('listAsyncUser')
-  async listAsyncUser(@Body() body: any, @Req() req: Request){
-    try {
-      let skip = 0;
+@Post('listAsyncUser')
+async listAsyncUser(@Body() body: any, @Req() req: Request) {
+  try {
+    let skip = 0;
+    const { page = 0, limit = 10, randomString = '' } = body;
 
-      const { page, limit } = body;
+    if (page && limit) skip = page * limit;
 
-      if(page && limit) skip = page * limit
+    const searchRegex = new RegExp(randomString, 'i');
 
-      return this.service.listAsync({}, skip, limit); // ´Pasar nueva data del body.
+    const filter = {
+      $or: [
+        { username: searchRegex },
+        { 'idPerson.name': searchRegex },
+        { 'idPerson.paternalSurname': searchRegex },
+        { 'idPerson.maternalSurname': searchRegex },
+      ],
+    };
 
-    } catch (error) {
-      throw error;
-    }
+    return this.service.listAsync(filter, skip, limit);
+  } catch (error) {
+    throw error;
   }
+}
+
 
   @Put('updateUserStatusType/:id')
   async updateUserStatusType(@Param('id')  id : string, @Body() body: any, @Req() req: Request){
